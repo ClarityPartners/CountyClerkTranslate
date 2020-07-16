@@ -1,0 +1,4 @@
+name = Government Views Overrides
+description = This module overrides Views behaviors for the government profile.
+package = Government
+core = 7.x

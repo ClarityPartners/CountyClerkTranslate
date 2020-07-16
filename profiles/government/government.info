@@ -1,0 +1,113 @@
+; Packaging information for government
+name = "Government"
+description = ""
+exclusive = "1"
+core = "7.x"
+; ----------
+; Dependencies
+; ----------
+; Administration
+dependencies[] = admin_menu
+dependencies[] = admin_views
+dependencies[] = adminimal_admin_menu
+dependencies[] = module_filter
+; Background Images
+dependencies[] = bg_image
+; Chaos tool suite
+dependencies[] = ctools
+; Context
+dependencies[] = context
+dependencies[] = context_ui
+; Core
+dependencies[] = block
+dependencies[] = contextual
+dependencies[] = dblog
+dependencies[] = field
+dependencies[] = field_sql_storage
+dependencies[] = field_ui
+dependencies[] = file
+dependencies[] = filter
+dependencies[] = image
+dependencies[] = list
+dependencies[] = node
+dependencies[] = options
+dependencies[] = path
+dependencies[] = system
+dependencies[] = taxonomy
+dependencies[] = text
+dependencies[] = user
+; Date/Time
+dependencies[] = calendar
+dependencies[] = date
+dependencies[] = date_api
+dependencies[] = date_ical
+dependencies[] = date_popup
+dependencies[] = date_views
+; Features extra
+dependencies[] = fe_block
+dependencies[] = fe_date
+; Fields
+dependencies[] = addressfield
+dependencies[] = email
+dependencies[] = entityreference
+dependencies[] = gov_field_bases
+dependencies[] = field_collection
+dependencies[] = field_group
+dependencies[] = filefield_paths
+dependencies[] = link
+dependencies[] = node_reference
+dependencies[] = office_hours
+dependencies[] = references
+dependencies[] = taxonomy_formatter
+dependencies[] = telephone
+; FlexSlider
+dependencies[] = flexslider
+; Government
+dependencies[] = gov_custom_publish
+dependencies[] = gov_featured_media
+; Markup
+dependencies[] = html5_tools
+; Media
+dependencies[] = file_entity
+dependencies[] = imce
+dependencies[] = imce_filefield
+dependencies[] = imce_mkdir
+dependencies[] = media
+; Other
+dependencies[] = addressfield_staticmap
+dependencies[] = addtocal
+dependencies[] = bg_image_formatter
+dependencies[] = blockify
+dependencies[] = elements
+dependencies[] = entity
+dependencies[] = libraries
+dependencies[] = nodeconnect
+dependencies[] = pathauto
+dependencies[] = scheduler
+dependencies[] = strongarm
+dependencies[] = token
+; UUID
+dependencies[] = uuid
+; User interface
+dependencies[] = imce_wysiwyg
+dependencies[] = jquery_update
+dependencies[] = wysiwyg
+; Views
+dependencies[] = better_exposed_filters
+dependencies[] = views
+dependencies[] = views_bulk_operations
+dependencies[] = views_ui
+; Features
+dependencies[] = features
+dependencies[] = agency_content_type
+dependencies[] = agency_hierarchy_taxonomy
+dependencies[] = basic_page_content_type
+dependencies[] = basic_page_context
+dependencies[] = entity_reference_filtered_by_agency_hierarchy_view
+dependencies[] = event_category_taxonomy
+dependencies[] = event_content_type
+dependencies[] = icons_taxonomy
+dependencies[] = news_content_type
+dependencies[] = services_content_type
+dependencies[] = uuid_features
+

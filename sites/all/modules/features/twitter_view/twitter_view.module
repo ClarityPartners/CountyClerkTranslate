@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Twitter view feature.
+ */
+
+include_once 'twitter_view.features.inc';

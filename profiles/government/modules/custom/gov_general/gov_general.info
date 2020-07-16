@@ -1,0 +1,9 @@
+name = Government General Settings
+description = Configure general settings like form labels, image styles, and media browser.
+core = 7.x
+package = Government
+version = 7.x-1.0
+
+dependencies[] = media
+dependencies[] = workbench
+dependencies[] = workbench_media

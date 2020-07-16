@@ -1,0 +1,17 @@
+name = News Archive Context
+description = Context for adding news archive blocks to pages.
+core = 7.x
+package = Government Contexts
+version = 7.x-1.2
+dependencies[] = block
+dependencies[] = blockify
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = fe_block
+dependencies[] = gov_news_archive
+dependencies[] = views
+features[context][] = news_archive
+features[ctools][] = context:context:3
+features[fe_block_settings][] = gov_news_archive-news_archive_sidebar_block
+features[fe_block_settings][] = views-news_archive-by_year
+features[features_api][] = api:2

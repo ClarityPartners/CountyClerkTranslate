@@ -1,0 +1,12 @@
+name = All Related Events Context
+description = Context for agency event listing pages.
+core = 7.x
+package = Government Contexts
+version = 7.x-1.1
+dependencies[] = blockify
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = views
+features[context][] = agency_events
+features[ctools][] = context:context:3
+features[features_api][] = api:2

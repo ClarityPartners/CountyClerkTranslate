@@ -1,0 +1,353 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Jul 21, 2017, 3:08:47 AM
+    Author     : delion
+*/
+
+.publications-grid{
+    @media (max-width: $screen-md-min){
+        padding-left:0;
+        padding-right:0;
+    }
+
+    .views-column{
+        margin:5px;
+        background-color:$grey-color;
+        padding:0;
+
+        @media (min-width: $screen-md){
+            max-width:32%;
+        }
+        @media (max-width: $screen-md){
+            margin-left:0;
+            margin-right:0;
+        }
+
+        .pub-container{
+            padding:25px 10px;
+            @include font-size(1.5);
+
+            h4{
+                margin-bottom:0;
+                font-weight:600;
+                @include font-size(1.5);
+            }
+            .file-type{
+                //text-transform: uppercase;
+                h4{
+                    display:inline-block;
+                    padding-right:10px;
+                    text-transform: none;
+                }
+            }
+            .imagery{
+                a{
+                    display:block;
+                }
+            }
+            .copy{
+                word-wrap: break-word;
+
+                img{display:none;}
+                .file-type{
+                    display:block;
+                }
+
+                @media (min-width: $screen-lg){
+                    float:right;
+                }
+                .copy-title a{
+                    text-transform: capitalize;
+                }
+            }
+            .lower.pub{
+                border-top:1px solid #CCC;
+                padding-top:15px;
+                margin-top:15px;
+            }
+        }
+    }
+    .views-column-first{
+        margin-left:0;
+    }
+    .views-column-last{
+        margin-right:0;
+    }
+    .view-content{
+        border-bottom:1px solid #CCC;
+        padding-bottom:20px;
+        margin-bottom:20px;
+    }
+}
+.publications-list{
+    table{
+        tr{
+            background:none !important;
+
+            &:hover{
+                .active{
+                    background:none;
+                }
+            }
+        }
+        td{
+            border:none;
+        }
+        thead{
+            th{
+                border-bottom: 4px solid #ddd;
+                @include font-size(1.6);
+
+                a{
+                    color:#333;
+
+                    img{
+                        display:none;
+                    }
+                }
+                &:nth-last-child(-n+3){
+                    a{
+                        &:after{
+                            content:'';
+                            background-image:url(../img/sort-icon.svg);
+                            width: 7px;
+                            height: 16px;
+                            display: inline-block;
+                            background-size: 7px;
+                            margin: 0 5px 0;
+                            vertical-align: middle;
+                        }
+                    }
+                }
+
+            }
+        }
+        tbody{
+            td{
+                &.active{
+                    background:none;
+
+                    &:hover{
+                        background:none;
+                    }
+                }
+                &.views-field-sm-field-publication-type{
+                    text-transform: uppercase;
+                }
+                img{
+                    box-shadow: 0px 0px 8px #777;
+                }
+                &.views-field-title{
+                    text-transform: capitalize;
+                }
+            }
+        }
+    }
+    .view-content{
+        border-bottom:1px solid #CCC;
+        padding-bottom:20px;
+        margin-bottom:20px;
+    }
+}
+.publications-grid,
+.publications-list{
+    padding-left:0;
+    padding-right:0;
+     //seach box
+    .pub-search-container{
+        display:flex;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(51% - 50vw);
+        background-color:$blue-color;
+        padding:20px;
+
+        @media (min-width: $screen-md){
+            padding:50px;
+        }
+
+        .pub-search{
+            &> div{
+                @include make-sm-column(12);
+                @include make-md-column(5);
+                @include make-lg-column(12);
+            }
+            label{
+                color:#FFF;
+                text-transform: uppercase;
+                padding: 0 40px 0 0;
+                @include font-size(2.0);
+            }
+            .views-widget{
+                display:inline-block;
+
+                input{
+                    border-radius:0;
+                }
+            }
+
+        }
+    }
+    //view-header
+    .view-header{
+        padding:10px 0 30px;
+    }
+    //exposed filters
+    .pub-exposed{
+        & > div{
+            display:inline-block;
+            float:none;
+            vertical-align: middle;
+        }
+        .views-exposed-widget{
+            padding:30px 0 30px 30px;
+            float:none;
+
+            /*&:nth-last-child(-n+3){
+                @include make-sm-column(3);
+                @include make-md-column(3.5);
+                @include make-lg-column(4);
+                float:none !important;
+
+                select{
+                    width:100%;
+                }
+                label{
+                    display:table-cell;
+                    padding-right:5px;
+                }
+                .views-widget{
+                    display: table-cell;
+                }
+                @media (max-width: $screen-md){
+                    padding-top: 0px;
+                }
+            }*/
+            &:last-child{
+                display:none;
+            }
+
+            .form-control{
+                display:inline-block;
+                width:auto;
+                border-radius:0;
+            }
+        }
+        .views-widget{
+            display:inline-block;
+        }
+        #edit-search-api-views-fulltext-wrapper{display:none;}//find an alternative later
+
+        &.map-room{
+            .views-exposed-widget{
+               // &:last-child{
+                    @include make-xs-column(12);
+                    @include make-sm-column(4);
+                    @include make-md-column(3);
+                    //@include make-lg-column(4);
+                    float:none !important;
+
+                    select{
+                        width:100%;
+                        //display:table-cell;
+                    }
+                    label{
+                        display:table-cell;
+                        padding-right:5px;
+                    }
+                    .views-widget{
+                        display: table-cell;
+                        width:100%;
+                    }
+                    @media (max-width: $screen-md){
+                        padding-top: 0px;
+                        padding-bottom: 0px;
+                    }
+                    @media (max-width: $screen-xs){
+                        padding-bottom:10px;
+                    }
+                    & > div{
+                        //display:table;
+                    }
+                    &.views-widget-per-page{
+                        &> div{
+                            //display:table;
+
+                            label{
+                                @include make-xs-column(3);
+                                @include make-sm-column(4);
+                                @include make-md-column(3);
+                                line-height:30px;
+                                padding-left:0;
+                            }
+                            select{
+                                @include make-xs-column(9);
+                                @include make-sm-column(7);
+                                @include make-md-column(8);
+                            }
+                        }
+                    }
+                //}
+            }
+        }
+        &.pubs{
+            .views-exposed-widget{
+                &:nth-last-child(-n+3){
+                    @include make-sm-column(3);
+                    @include make-md-column(3.5);
+                    @include make-lg-column(4);
+                    float:none !important;
+
+                    select{
+                        width:100%;
+                    }
+                    label{
+                        display:table-cell;
+                        padding-right:5px;
+                    }
+                    .views-widget{
+                        display: table-cell;
+                        width:100%;
+                    }
+                    @media (max-width: $screen-md){
+                        padding-top: 0px;
+                    }
+                }
+            }
+        }
+    }
+    //results
+    .text-center{
+        float:right;
+
+        .pagination{
+            padding:0;
+            margin:0;
+        }
+    }
+    .attachment-after{
+        float:right;
+        padding:8px 20px;
+    }
+    .view-content{
+        .views-row{
+            img{
+                box-shadow: 0px 0px 8px #777;
+            }
+        }
+    }
+    .pub-container{
+        img{
+            box-shadow: 0px 0px 8px #777;
+        }
+    }
+}
+.pub-display-switch{
+    @extend .page-display-switch;
+    position:relative;
+    right:auto;
+    margin-top:0;
+}

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Election Results feature.
+ */
+
+include_once 'election_results.features.inc';

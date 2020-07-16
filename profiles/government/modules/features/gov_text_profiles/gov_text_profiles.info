@@ -1,0 +1,12 @@
+name = Government Text Profiles
+description = Profiles related to the user experience of editing text. Text formats and WYSIWYG profiles.
+core = 7.x
+package = Government
+version = 7.x-1.2
+features[features_api][] = api:2
+features_exclude[dependencies][features] = features
+features_exclude[dependencies][media_wysiwyg] = media_wysiwyg
+features_exclude[dependencies][video_filter] = video_filter
+features_exclude[dependencies][wysiwyg] = wysiwyg
+files[] = gov_text_profiles.features.filter
+files[] = gov_text_profiles.features.wysiwyg

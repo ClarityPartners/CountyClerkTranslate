@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the I Want to Views feature.
+ */
+
+include_once 'i_want_to_views.features.inc';

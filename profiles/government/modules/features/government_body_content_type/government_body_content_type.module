@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Government Body Content Type feature.
+ */
+
+include_once 'government_body_content_type.features.inc';

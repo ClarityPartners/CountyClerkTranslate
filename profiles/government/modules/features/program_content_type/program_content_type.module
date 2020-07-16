@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Program Content Type feature.
+ */
+
+include_once 'program_content_type.features.inc';

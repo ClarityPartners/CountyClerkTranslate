@@ -1,0 +1,26 @@
+Vertical Tabs Config 7.x-1.2, 2017-Mar-25
+-----------------------------------------
+
+#2809005: Move vertical tab weights to 'Manage fields' UI
+
+Vertical Tabs Config 7.x-1.1, 2017-Mar-15
+-----------------------------------------
+
+#2852158: "Hide Publishing options" prevents publishing a node
+
+Vertical Tabs Config 7.x-1.0, 2016-Oct-15
+-----------------------------------------
+
+#2809873: Add panelizer to hardcoded list of vertical tabs
+
+Vertical Tabs Config 7.x-1.0-beta2, 2016-Jan-21
+-----------------------------------------------
+
+#2638230: Add book to hardcoded list of vertical tabs
+#2638240: Clearing Cache instructions to see new order
+
+
+Vertical Tabs Config 7.x-1.0-beta1, 2015-Apr-21
+-----------------------------------------------
+
+Initial release of vertical_tabs_config module.

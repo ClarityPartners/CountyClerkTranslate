@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Contact Us Context feature.
+ */
+
+include_once 'contact_us_context.features.inc';

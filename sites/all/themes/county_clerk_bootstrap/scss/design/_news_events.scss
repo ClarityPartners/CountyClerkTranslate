@@ -1,0 +1,282 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Apr 5, 2017, 10:04:44 AM
+    Author     : delion
+*/
+//landing page
+.news-page{
+    .news_last{
+        padding:20px 0 0;
+
+        .news_title{
+            @include font-size(3.0);
+        }
+        .news_body{
+            padding:15px 0;
+        }
+    }
+    .news_bar{
+        //border-top:1px solid #CCC;
+        padding:5px 0;
+        margin-top:5px;
+        padding-bottom:20px;
+
+        .news_date,
+        .news_cat{
+            display:inline-block;
+        }
+        .news_cat{
+            border-left:1px solid #000;
+            padding-left: 15px;
+            margin-left: 10px;
+        }
+    }
+}
+//detail page
+.node-news,
+.node-event{
+    .date-category{
+        padding:10px 0;
+
+
+        .field{
+            display:inline-block;
+            vertical-align: top;
+
+            .field-item{
+                display:inline-block;
+                padding:0 5px;
+                float:left;
+                clear:both;
+
+                span.date-display-range{
+                    display:block;
+                }
+
+                &:after{
+                    content:'';
+                    display:inline-block;
+                    color:#337ab7;
+                }
+                &:last-child{
+                    &:after{
+                        content:'';
+                    }
+                }
+            }
+            &.field-name-field-news-author{
+                border-right:2px solid #CCC;
+                padding-right:5px;
+                margin-right:5px;
+            }
+            &.field-name-field-news-category,
+            &.field-name-field-media-type{
+                font-style:italic;
+                font-size: 90%;
+
+                .field-item{
+                    padding: 0 2px;
+                }
+            }
+            &.field-name-field-news-category{
+                > div{
+                    &:after{
+                        //content:',';
+                    }
+                }
+            }
+        }
+         &.news{
+            padding:10px 0 10px;
+            border-bottom: 3px solid #ccc;
+            margin: 0 0 10px;
+
+             .field-type-datetime{
+                 .field-item{
+                     float:none;
+                 }
+             }
+        }
+    }
+    .group-category{
+        .field{
+            display:inline-block;
+            font-style: italic;
+
+            .field-item{
+                display: inline-block;
+                margin: 0 2px;
+
+                &:after{
+                    content:',';
+                }
+            }
+            &:last-child{
+                .field-item{
+                    &:last-child{
+                        &:after{
+                            content:'';
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    .event-category{
+        padding:20px 0;
+
+        h3{
+            @include font-size(1.8);
+            font-weight:600;
+            display:inline-block;
+            vertical-align: top;
+            margin-top:0;
+            @include make-md-column(2);
+            @include make-lg-column(2);
+        }
+        .field{
+            display:inline-block;
+            vertical-align: top;
+        }
+        .field-collection-container{
+            border:none;
+            margin:0;
+
+            .field-collection-view{
+                padding:0;
+                margin:0;
+                border:none;
+
+                .field-name-field-phone-type{
+                    padding:0 10px;
+                }
+            }
+        }
+        .field-name-field-date-and-time{
+            padding:0 10px;
+
+            @media(min-width:$screen-md-min){
+                max-width:30%;
+                padding:0;
+            }
+        }
+    }
+    .location-category{
+        header{
+            display:none;
+        }
+        .field-name-field-event-location-detail{
+            @include make-md-column(6);
+            @include make-lg-column(6);
+            float:right !important;
+            clear:none;
+
+            @media (max-width:$screen-md-min){
+                padding:20px;
+            }
+        }
+    }
+    .field-name-field-news-content{
+        padding: 20px 0;
+        //border-bottom: 1px solid #ccc;
+    }
+
+    &.node-teaser{
+        h2{
+            margin-bottom: 0;
+        }
+        .field-name-field-news-content,
+        .field-name-field-event-description{
+            border:none;
+        }
+        .teaser-date{
+            .field{
+                display:inline-block;
+                vertical-align: top;
+                padding: 0 5px 0 0;
+            }
+            .field-name-field-news-category{
+                border-left: 1px solid #000;
+                padding-left:10px;
+                margin-left:10px;
+
+                .field-item{
+                    display:inline-block;
+                    padding:0 5px;
+
+                    &:after{
+                        content:',';
+                        display:inline-block;
+                        color:#337ab7;
+                    }
+                    &:last-child{
+                        &:after{
+                            content:'';
+                        }
+                    }
+                }
+            }
+        }
+        .node-readmore{
+            text-transform: capitalize;
+        }
+    }
+    .field-name-field-event-description,
+    .field-name-field-description{
+        padding:20px;
+    }
+    //event location
+    .event-location{
+        h2{
+            display:none;
+        }
+        .field-name-field-location-postal-address{
+            padding:0 15px;
+        }
+    }
+    .field-type-image{
+        img{
+            width:100%;
+        }
+    }
+}
+.node-news{
+    .field-name-field-description{
+        padding:20px 0; //different from event type.
+
+        @media all and(max-width: 500px){
+            img {
+                display: block !important;
+                float: none !important;
+                margin: 15px auto;
+            }
+        }
+    }
+}
+//archive block
+#block-gov-news-archive-news-archive-sidebar-block{
+    .archive-year-label{
+        color:#337ab7;
+        cursor:pointer;
+
+        &:hover{
+            color:#23527c;
+            text-decoration: underline;
+        }
+    }
+    .news-archive-month{
+        padding: 2px 0 6px 15px;
+
+        &.collapsed{
+            display:none;
+        }
+        &.visible{
+            display:block;
+        }
+    }
+}

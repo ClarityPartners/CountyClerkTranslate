@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Homepage Banner EntityQueue feature.
+ */
+
+include_once 'homepage_banner_entityqueue.features.inc';

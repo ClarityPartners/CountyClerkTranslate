@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Icons Taxonomy feature.
+ */
+
+include_once 'icons_taxonomy.features.inc';

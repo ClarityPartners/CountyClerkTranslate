@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the News Landing Context feature.
+ */
+
+include_once 'news_landing_context.features.inc';

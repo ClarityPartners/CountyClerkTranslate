@@ -1,0 +1,11 @@
+name = Entity Reference filtered by Agency Hierarchy view
+description = Entity reference view to filter available agencies and services by user's editorial group assignment
+core = 7.x
+package = Government Views
+version = 7.x-1.2
+dependencies[] = entityreference
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = entity_reference_list_by_section
+features_exclude[dependencies][ctools] = ctools

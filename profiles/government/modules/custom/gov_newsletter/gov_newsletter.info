@@ -1,0 +1,12 @@
+name = Government Newsletter Export
+description = Adds a menu option to export newsletter content compiled from a Newsletter content type.
+core = 7.x
+package = Government
+
+dependencies[] = entityreference
+dependencies[] = news_content_type
+
+configure = admin/config/media/newsletter-export
+
+files[] = plugins/gov_newsletter.install
+files[] = plugins/gov_newsletter.tpl.php

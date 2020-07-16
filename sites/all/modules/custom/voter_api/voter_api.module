@@ -1,0 +1,404 @@
+<?php
+
+/**
+ * This module integrates with the voter api provided in .net.
+ */
+
+/**
+ * Implements hook_permission.
+ */
+function voter_api_permission() {
+  return [
+    'administer_voter_api_settings' => [
+      'title' => 'Administer voter tool settings',
+      'description' => 'Gives access to all settings on voter tool settings page.',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_menu.
+ */
+function voter_api_menu() {
+  $items = [];
+
+  // This page will update the urls and credentials for various endpoints.
+  $items['admin/config/voter-api-settings'] = [
+    'title' => 'Voter API Settings',
+    'description' => 'Set Voter Search settings here.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['voter_api_admin_form'],
+    'access arguments' => ['administer_voter_api_settings'],
+    'type' => MENU_NORMAL_ITEM,
+  ];
+
+  return $items;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ *
+ * @return array
+ */
+function voter_api_admin_form($form, $form_state) {
+  $form = [];
+
+  $form['voter_api_base_url'] = [
+    '#type' => 'textfield',
+    '#title' => 'Uri endpoint for voter apis.',
+    '#default_value' => variable_get('voter_api_base_url'),
+  ];
+  /*$form['voter_candidate_statement'] = [ not needed
+    '#type' => 'textfield',
+    '#title' => 'Candidate statement api',
+    '#default_value' => variable_get('voter_candidate_statement'),
+  ];*/
+  $form['voter_api_translation_codes'] = [
+    '#type' => 'textfield',
+    '#title' => 'Comma separated list of language codes to add to translation widget. https://translate.google.com/intl/en/about/languages/',
+    '#default_value' => variable_get('voter_api_translation_codes'),
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#name' => 'voter_settings',
+    '#value' => 'submit',
+  ];
+
+  return $form;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function voter_api_admin_form_validate($form, &$form_state) {
+
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function voter_api_admin_form_submit($form, &$form_state) {
+  variable_set('voter_api_base_url', check_plain($form_state['values']['voter_api_base_url']));
+  variable_set('voter_api_translation_codes', check_plain($form_state['values']['voter_api_translation_codes']));
+}
+
+/**
+ * @param $tab_name
+ *
+ * @return array
+ */
+function voter_api_search_byaddress_form($tab_name) {
+  $form = [];
+
+
+  $form['housenumber'] = [
+    '#type' => 'textfield',
+    '#title' => 'House Number<span class="required">*</span>',
+  ];
+
+  $form['direction'] = [
+    '#type' => 'select',
+    '#options' => ['N' => 'N', 'E' => 'E', 'S' => 'S', 'W' => 'W'],
+    '#empty_option' => '--',
+    '#title' => 'Direction',
+  ];
+
+  $form['street'] = [
+    '#type' => 'textfield',
+    '#title' => 'Street<span class="required">*</span>',
+  ];
+
+  $form['street_suffix'] = [
+    '#type' => 'select',
+    '#options' => array(
+      'NULL' => '--',
+      'AVE' => 'AVE',
+      'BLVD' => 'BLVD',
+      'CIR' => 'CIR',
+      'CRES' => 'CRES',
+      'CT' => 'CT',
+      'DR' => 'DR',
+      'EST' => 'EST',
+      'GLN' => 'GLN',
+      'HBR' => 'HBR',
+      'HWY' => 'HWY',
+      'LN' => 'LN',
+      'MEWS' => 'MEWS',
+      'MNR' => 'MNR',
+      'PARK' => 'PARK',
+      'PASS' => 'PASS',
+      'PKWY' => 'PKWY',
+      'PL' => 'PL',
+      'PNES' => 'PNES',
+      'PT' => 'PT',
+      'RD' => 'RD',
+      'RDG' => 'RDG',
+      'RUN' => 'RUN',
+      'SPGS' => 'SPGS',
+      'SQ' => 'SQ',
+      'ST' => 'ST',
+      'TER' => 'TER',
+      'TPKE' => 'TPKE',
+      'TRL' => 'TRL',
+      'TRLR' => 'TRLR',
+      'VW' => 'VW',
+      'WALK' => 'WALK',
+      'WAY' => 'WAY',
+      'WD' => 'WD',
+      'WDS' => 'WDS',
+      'WK' => 'WK'
+    ),
+    '#title' => 'Type',
+    '#prefix' => '<div class="street-type form-group">',
+    '#suffix' => '</div>',
+  ];
+  $form['zipcode'] = [
+    '#type' => 'textfield',
+    '#title' => 'Zip Code<span class="required">*</span>',
+  ];
+
+  $form['lastname'] = [
+    '#type' => 'textfield',
+    '#title' => 'Last Name',
+    '#description' => 'If you live in an apartment building, assisted living complex, or any other housing unit, we recommend you submit your last name to narrow your search results.',
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#name' => $tab_name . '-byaddress',
+    '#value' => 'Submit',
+  ];
+  $form['help'] = [
+    '#prefix' => '<div class="help-text">',
+    '#markup' => 'If you live in an apartment building, assisted living complex, or any other housing unit, we recommend you submit your last name to narrow your search results.',
+    '#suffix' => '</div>',
+  ];
+
+  return $form;
+}
+
+/**
+ * @param $tab_name
+ *
+ * @return mixed
+ */
+function voter_api_search_bybirthday_form($tab_name) {
+  $date = format_date(mktime(0, 0, 0, 1, 1, 1997), 'custom', 'Y-m-d H:i:s');
+  $format = 'm-d-Y';
+
+  $form['lastname'] = [
+    '#type' => 'textfield',
+    '#title' => 'Last Name',
+  ];
+
+  $form['birthdate'] = [
+    '#type' => 'date_select',
+    '#title' => 'Birthday<span class="required">*</span>',
+    '#date_format' => $format,
+    '#date_year_range' => '-111:-16',
+    '#default_value' => $date,
+  ];
+
+  $form['ssn4'] = [
+    '#type' => 'textfield',
+    '#title' => 'Last 4 digits of SSN<span class="required">*</span>',
+    '#maxlength' => 4,
+    '#size' => 4,
+  ];
+
+  $form['or'] = [
+    '#markup' => '<div class="bold-or"> OR </div>',
+  ];
+
+  $form['dlstateid'] = [
+    '#type' => 'textfield',
+    '#title' => 'License / State ID #<span class="required">*</span>',
+    '#maxlength' => 14,
+    '#size' => 14,
+  ];
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#name' => $tab_name . '-bybirthday',
+    '#value' => 'Submit',
+  ];
+
+  return $form;
+}
+
+/**
+ * This function validates an instance of the byaddress form
+ */
+function voter_api_validate_byaddress_form($values, $fieldset_label) {
+  $error_selector_prefix = $fieldset_label . '][';
+  $errors = [];
+  if (empty($values['housenumber'])) {
+    $errors[$error_selector_prefix . 'housenumber'] = 'You must enter a street number.';
+  }
+  if (!is_numeric($values['housenumber'])) {
+    $errors[$error_selector_prefix . 'housenumber'] = 'Street number must be a number. Exclude any letters.';
+  }
+  if (empty($values['street'])) {
+    $errors[$error_selector_prefix . 'street'] = 'You must enter a street name.';
+  }
+
+  if (empty($values['zipcode'])) {
+    $errors[$error_selector_prefix . 'zipcode'] = 'You must enter a zip code.';
+  }
+  if (!is_numeric($values['zipcode'])) {
+    $errors[$error_selector_prefix . 'zipcode'] = 'Zip code must be a number.';
+  }
+  if (strlen($values['zipcode']) !== 5) {
+    $errors[$error_selector_prefix . 'zipcode'] = 'Please enter 5 digit zip code only.';
+  }
+
+  return $errors;
+}
+
+/**
+ * This function validates an instance of the byaddress form
+ */
+function voter_api_validate_bybirthday_form($values, $fieldset_label) {
+  $error_selector_prefix = $fieldset_label . '][';
+  $errors = [];
+
+  if (empty($values['birthdate'])) {
+    $errors[$error_selector_prefix . 'birthdate'] = 'You must enter your birthday.';
+  }
+  if (empty($values['ssn4']) && empty($values['dlstateid'])) {
+    $errors[$error_selector_prefix . 'ssn4'] = 'You must enter either your last 4 SSN -OR- Drivers License number.';
+    $errors[$error_selector_prefix . 'dlstateid'] = '';
+  }
+
+  return $errors;
+}
+
+/**
+ * Fetches a feed from the voter api.
+ *
+ * @param $resource - url string to specific api endpoint.
+ * @param @params - array of query params to send with request.
+ *
+ * @return array - of results from api.
+ *   Different endpoints have different array structures.
+ *   Be sure you know how to parse them correctly.
+ */
+function voter_api_fetch_voter_search($resource, $params) {
+  // Do connection thing.
+  $lastname = isset($params['lastname']);
+  if($lastname != ''):
+    $params['lastname'] = preg_replace("/&#?[a-z0-9]+;/i"," ", $params['lastname']);
+  //stripping html characters from last name
+  endif;
+
+  $base_uri = variable_get('voter_api_base_url', 'https://dev-drupal.cookcountyclerk-test.com/api');
+  $uri = $base_uri . drupal_encode_path(check_plain(trim($resource)));
+  $param_string = http_build_query($params);
+  $results_json = drupal_http_request($uri . '?' . $param_string);
+  // Parse results from json to array.
+  if (isset($results_json->data)) {
+    $results_array = json_decode($results_json->data, TRUE);
+    // Return results.
+    return $results_array;
+  }
+  else {
+    return [];
+  }
+}
+
+/**
+ * @param $element
+ * @param bool $get_name
+ *
+ * @return array
+ */
+function voter_api_extract_address($element, $get_name = FALSE) {
+  $return = [];
+
+  // Assemble voter full address.
+  if (isset($element['Address1'])) {
+    $return['street'] = $element['Address1'];
+  }
+  else {
+    $return['street'] = $element['HouseNumber'];
+    if (!empty($element['HalfCode'])) {
+      $return['street'] .= ' ' . $element['HalfCode'];
+    }
+    if (!empty($element['StreetDirection'])) {
+      $return['street'] .= ' ' . $element['StreetDirection'];
+    }
+    $return['street'] .= ' ' . $element['StreetName'];
+    if (!empty($element['StreetSuffix'])) {
+      $return['street'] .= ' ' . $element['StreetSuffix'];
+    }
+    if (!empty($element['StreetDirectionPost'])) {
+      $return['street'] .= ' ' . $element['StreetDirectionPost'];
+    }
+    if (!empty($element['UnitTypeCode'])) {
+      $return['street'] .= ' ' . $element['UnitTypeCode'];
+    }
+    if (!empty($element['AptNum'])) {
+      $return['street'] .= ' ' . $element['AptNum'];
+    }
+  }
+  if (isset($element['CityName'])) {
+    $return['city'] = $element['CityName'];
+  }
+  elseif (isset($element['City'])) {
+    $return['city'] = $element['City'];
+  }
+  if (isset($element['State'])) {
+    $return['state'] = $element['State'];
+  }
+  if (isset($element['Zipcode'])) {
+    $return['zipcode'] = $element['Zipcode'];
+  }
+  elseif (isset($element['Zip'])) {
+    $return['zipcode'] = $element['Zip'];
+  }
+
+
+  if ($get_name) {
+    $return['name'] = $element['Name'];
+  }
+
+  return $return;
+}
+
+/**
+ * Injects google translate widget.
+ */
+function voter_api_translation_widget() {
+  $html = '';
+  $languages = variable_get('voter_api_translation_codes', 'es,hi,zh-CN');
+  $html .= <<<HTML
+<div id="google_translate_element"></div><script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: '$languages', layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL}, 'google_translate_element');
+}
+</script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+HTML;
+
+  return $html;
+}
+
+/**
+ * Generate csv file.
+ */
+function voter_api_generate_csv($data, $filename) {
+  //Set the Content-Type and Content-Disposition headers.
+  drupal_add_http_header('Content-Type', 'application/csv');
+  drupal_add_http_header('Content-Disposition', 'attachment; filename="' . $filename . '";', TRUE);
+  $fp = fopen('php://output', 'w');
+  array_unshift($data, array_keys($data[0]));
+  foreach ($data as $row) {
+    fputcsv($fp, $row);
+  }
+  fclose($fp);
+  drupal_exit();
+}

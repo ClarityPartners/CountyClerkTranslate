@@ -1,0 +1,6 @@
+name = doeo
+description = Tools to output DOEO information.
+core = 7.x
+package = Clarity
+version = 7.x-1.0
+dependencies[] = voter_api

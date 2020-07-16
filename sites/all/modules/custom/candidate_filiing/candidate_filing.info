@@ -1,0 +1,20 @@
+name = Candidate Filing
+description = Integrate candidate filing stats api.
+core = 7.x
+package = Clarity
+version = 7.x-1.0
+dependencies[] = voter_api
+
+#scripts
+#scripts[] = js/scripts/knockout.js
+scripts[] = js/scripts/knockout.js
+scripts[] = js/scripts/knockout.mapping-latest.js
+scripts[] = js/app/main.js
+
+#viewmodels
+scripts[] = js/app/_viewModels.js
+scripts[] = js/app/viewModels/CollectionViewModel.js
+scripts[] = js/app/viewModels/SingleViewModel.js
+scripts[] = js/app/viewModels/ElectionCollectionViewModel.js
+scripts[] = js/app/viewModels/DropDownViewModel.js
+scripts[] = js/app/viewModels/ElectionDropDownViewModel.js

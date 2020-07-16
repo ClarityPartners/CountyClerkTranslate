@@ -1,0 +1,188 @@
+//media library
+.media-library{
+    .view-filters{
+        background-color:#f3f3f3;
+
+        form{
+            max-width:1170px;
+            margin:0 auto;
+        }
+        .form-item-sort-by{display:none;}
+        #edit-sort-bef-combine-wrapper{
+            //position: absolute;
+            //right:15%;
+            padding: 8px 0;
+
+            @media (min-width:$screen-md-min){
+                position: absolute;
+                right:0;
+
+                label{
+                    display:inline-block;
+                    vertical-align: middle;
+                }
+                select{
+                    display:inline-block;
+                    max-width:64%;
+                    vertical-align: middle;
+                }
+            }
+        }
+        .views-exposed-form{
+            @include container-fixed();
+            position:relative;
+            padding:12px;
+
+            .views-exposed-widget{
+                @include make-sm-column(12);
+                @include make-md-column(2);
+                @include make-lg-column(2);
+
+                @media (max-width:$screen-md-min){
+                    width:100%;
+                    padding:10px 0;
+                }
+                .form-submit{
+                    border-radius:0;
+                    background-color:#65734b;
+                    border:none;
+                    margin:0;
+
+                    @media (max-width:$screen-md-min){
+                        width:100%;
+                        margin: 10px 0;
+                    }
+
+                    .ajax-progress-throbber {
+                        display: none;
+                    }
+                }
+                div{
+                    width:100%;
+                }
+            }
+            .form-select{
+                border-radius:0;
+            }
+        }
+    }
+
+    .view-content{
+        @extend .row;
+        max-width:1170px;
+        margin:0 auto !important; //row class is adding some undesired margins
+        padding:20px 0;
+
+    }
+    &.grid{
+        @extend .media-block-container;
+        background:none;
+        padding: 0;
+
+        .view-content{
+            padding:15px;
+
+            & > .views-row{
+              //  padding:15px;
+            }
+            .views-row{
+                background-color:#f3f3f3;
+
+
+                .vid_overlay{
+                    @extend .vid_overlay;
+                    background-color:#f3f3f3;
+
+                    .event-date{
+                        display:none;
+                    }
+                }
+                .event-image{
+                    .blank-img{
+                        background-color: black;
+                        display:block;
+                        width:100%;
+
+                        &:after{
+                            content: "";
+                            display: block;
+                            padding-bottom: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    &.list{
+        .view-content{
+            @media (max-width:$screen-md-min){
+                padding:20px;
+            }
+        }
+        .table-responsive{
+            padding: 10px 0;
+
+        }
+    }
+    .views-widget-filter-combine{
+        display: none;
+    }
+}
+.page-display-switch{
+    position: absolute;
+    padding: 8px 0;
+
+    &:before{
+        content:'View:';
+        display: inline-block;
+        vertical-align: middle;
+        margin:10px 10px 0 0;
+        font-weight:600;
+    }
+
+    a{
+     display:inline-block;
+     vertical-align: top;
+     background-color:#e0e0e0;
+     color:#111;
+     padding:6px 12px;
+     text-decoration:none;
+     border: solid 1px #ccc;
+
+        &:hover{
+            background-color:#eee;
+        }
+
+        &.active{
+            background-color:#7a1618;
+            color:#FFF;
+            border:1px solid #7a1618;
+       }
+    }
+    @media (max-width:$screen-sm-max){
+        clear: both;
+        // margin-top:21%;
+        z-index:9;
+        position:relative;
+    }
+    @media (max-width:$screen-sm-min - 1px){
+        //right:5%;
+        margin-top:0;
+        z-index:9;
+        float:right;
+    }
+    @media (min-width:$screen-md-min){
+        right:20%;
+    }
+    @media (min-width:$screen-lg-min){
+        right: 18%;
+    }
+}
+.page-media-library-grid,
+.page-media-library-list{
+    .section-padding{
+        @media (max-width:$screen-md-min){
+            padding:0 !important; //why did i do this?
+        }
+    }
+}

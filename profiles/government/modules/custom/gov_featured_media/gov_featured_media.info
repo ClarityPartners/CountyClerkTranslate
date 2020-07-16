@@ -1,0 +1,6 @@
+name = Government Featured Media
+description = Provides custom field formatter for the Featured Media Fields.
+core = 7.x
+package = Government
+version = 7.x-1.0
+dependencies[] = media

@@ -1,0 +1,24 @@
+diff --git a/sites/all/modules/contrib/conditional_fields/conditional_fields.module b/sites/all/modules/contrib/conditional_fields/conditional_fields.module
+index 34503a68..9d97c5b2 100644
+--- a/sites/all/modules/contrib/conditional_fields/conditional_fields.module
++++ b/sites/all/modules/contrib/conditional_fields/conditional_fields.module
+@@ -544,10 +544,18 @@ function conditional_fields_form_after_build($form, &$form_state) {
+       // Add the $state into the correct logic group in $states.
+       foreach ($state as $key => $constraints) {
+         if (empty($states[$key][$options['grouping']])) {
++          foreach ($constraints as $c_key => $value) {
++	      	$constraints[$c_key][] = $value;
++		  	unset($constraints[$c_key]['value']);
++          }
+           $states[$key][$options['grouping']] = $constraints;
+         }
+         else {
+-          $states[$key][$options['grouping']] = array_merge($states[$key][$options['grouping']], $constraints);
++          foreach ($constraints as $c_key => $value) {
++	      	$constraints[$c_key][] = $value;
++		  	unset($constraints[$c_key]['value']);
++          }
++          $states[$key][$options['grouping']] = array_merge_recursive($states[$key][$options['grouping']], $constraints);
+         }
+       }
+ 

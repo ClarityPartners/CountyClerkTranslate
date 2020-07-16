@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Module test file.
+ */
+
+/**
+ * Tests the functionality of the Link click count module
+ */
+class LinkClickCountTestCase extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Link Click Count Test Case',
+      'description' => 'Ensure that the link click count module has test case.',
+      'group' => 'Link',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp(array('link_click_count'));
+  }
+
+  /**
+   * Tests link click.
+   */
+  public function testLinkClickCountStatsPage() {
+    $this->drupalGet('link-click-count-stats');
+    $this->assertText('Link Click Count Stats');
+  }
+
+}

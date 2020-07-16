@@ -1,0 +1,12 @@
+name = Calendar Context Week
+description = Context for the calendar week display.
+core = 7.x
+package = Government Contexts
+version = 7.x-1.0
+dependencies[] = blockify
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = views
+features[context][] = calendar_week
+features[ctools][] = context:context:3
+features[features_api][] = api:2

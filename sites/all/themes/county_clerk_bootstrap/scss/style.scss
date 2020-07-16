@@ -1,0 +1,43 @@
+// Default variables.
+@import 'default-variables';
+
+// Bootstrap Framework.
+@import '../bower_components/bootstrap/assets/stylesheets/bootstrap';
+//fontawesome
+@import '../bower_components/font-awesome/scss/font-awesome';
+// Base-theme overrides.
+@import 'overrides';
+
+//hamburger navigation
+@import '../bower_components/css-hamburgers/_sass/hamburgers/hamburgers';
+
+//other files
+@import 'global/main';
+@import 'design/paragraph';
+@import 'design/slick';
+@import 'design/news_events';
+@import 'design/video';
+
+//one off pages
+@import 'design/media-library';
+@import 'design/locations';
+@import 'design/doc_center';
+@import 'design/contact';
+@import 'design/tif-content';
+@import 'design/election-results';
+@import 'design/registration';
+@import 'design/election_home';
+
+.container {
+  //max-width: 60em;
+  //@include make-container();
+  &.app{
+    padding-left:0;
+    padding-right:0
+  }
+}
+
+row{
+   @include make-row();
+}
+

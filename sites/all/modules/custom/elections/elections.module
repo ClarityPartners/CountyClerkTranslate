@@ -1,0 +1,73 @@
+<?php
+//elections modal
+
+function elections_block_info(){
+  $blocks = [];
+  $blocks['block'] = [
+    'info' => t('Elections Modal'),
+    'cache' => DRUPAL_NO_CACHE,
+  ];
+
+  return $blocks;
+}
+
+function elections_block_view($delta=''){
+  $block = [];
+
+  switch($delta){
+    case 'block' :
+      $block['content'] = theme('electiontemp');
+      break;
+  }
+  return $block;
+}
+
+function elections_block_configure($delta=''){
+  $form = [];
+
+  switch($delta){
+    case 'block' :
+    $form['text_modal'] = [
+      '#type' => 'text_format',
+      '#title' => t('Content in Modal Popup #1 Green Background'),
+      '#default_value' => variable_get('text_modal', ''),
+    ];
+    $form['text_modal_2'] = [
+      '#type' => 'text_format',
+      '#title' => t('Content in Modal Popup #2 Blue Background'),
+      '#default_value' => variable_get('text_modal_2', ''),
+    ];
+    $form['text_modal_3'] = [
+      '#type' => 'text_format',
+      '#title' => t('Content in Modal Popup #3 Grey Background'),
+      '#default_value' => variable_get('text_modal_3', ''),
+    ];
+    $form['text_modal_4'] = [
+      '#type' => 'text_format',
+      '#title' => t('Content in Modal Popup #4 Red Background'),
+      '#default_value' => variable_get('text_modal_4', ''),
+    ];
+    break;
+  }
+  return $form;
+}
+
+function elections_block_save($delta = '', $edit = array()){
+  switch($delta){
+    case 'block' :
+    variable_set('text_modal', $edit['text_modal']['value']);
+    variable_set('text_modal_2', $edit['text_modal_2']['value']);
+    variable_set('text_modal_3', $edit['text_modal_3']['value']);
+    variable_set('text_modal_4', $edit['text_modal_4']['value']);
+    break;
+  }
+}
+
+function elections_theme($existing, $type, $theme, $path){
+  return [
+    'electiontemp' => [
+      'template' => 'elections',
+      'path' => drupal_get_path('module', 'elections') . '/templates',
+    ],
+  ];
+}

@@ -1,0 +1,15 @@
+name = News Category Context
+description = Context for adding news category blocks to pages.
+core = 7.x
+package = County Clerk Contexts
+version = 7.x-1.1
+dependencies[] = block
+dependencies[] = blockify
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = views
+features[context][] = news_category
+features[ctools][] = context:context:3
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features_exclude[dependencies][gov_news_archive] = gov_news_archive

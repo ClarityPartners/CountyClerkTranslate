@@ -1,0 +1,13 @@
+name = Linkit Autocomplete
+description = Linkit modules and associated functionality
+core = 7.x
+package = Features
+version = 7.x-1.0
+dependencies[] = features
+dependencies[] = linkit
+dependencies[] = linkit_autocomplete
+dependencies[] = menu
+features[features_api][] = api:2
+features[menu_custom][] = management
+features[menu_links][] = management_linkit-profiles:admin/config/content/linkit
+features[user_permission][] = administer linkit

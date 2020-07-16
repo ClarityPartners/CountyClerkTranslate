@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the News Category Taxonomy feature.
+ */
+
+include_once 'news_category_taxonomy.features.inc';

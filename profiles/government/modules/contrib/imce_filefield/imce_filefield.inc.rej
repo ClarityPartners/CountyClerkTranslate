@@ -1,0 +1,18 @@
+--- imce_filefield.inc
++++ imce_filefield.inc
+@@ -143,6 +143,10 @@
+ 
+   // Validate.
+   foreach ($element['#upload_validators'] as $function => $args) {
++    // Check if the user is allowed to select large files
++    if ($function == 'file_validate_size' && user_access('imceff select large files')) {
++      continue;
++    }
+     array_unshift($args, NULL);
+     $args[0] = &$file;
+     $errors = array_merge($errors, call_user_func_array($function, $args));
+@@ -240,4 +244,4 @@
+     }
+   }
+   return !empty($headers);
+-}+}

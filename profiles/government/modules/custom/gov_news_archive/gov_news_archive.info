@@ -1,0 +1,5 @@
+name = Government News Archive
+description = Created news archive block.
+core = 7.x
+package = Government
+version = 7.x-1.0

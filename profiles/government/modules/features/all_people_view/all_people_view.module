@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the All People View feature.
+ */
+
+include_once 'all_people_view.features.inc';

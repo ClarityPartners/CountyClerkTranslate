@@ -1,0 +1,3 @@
+name = Field Group Features Fix
+description = Applies a fix for field_group module that allows it to work with features
+core = 7.x

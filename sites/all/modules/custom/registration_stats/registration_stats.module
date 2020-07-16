@@ -1,0 +1,256 @@
+<?php
+/**
+ * Implements hook_block_info().
+ */
+function registration_stats_block_info() {
+  // This example comes from node.module.
+  $blocks['registration_stats'] = array(
+    'info' => t('Registration Statistics'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function registration_stats_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'registration_stats':
+      $block['subject'] = '';
+      $block['content'] = drupal_get_form('registration_stats_block_form');
+//      $block['content'] ='Hi mom!';
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Form definition for registration statistics search.
+ */
+function registration_stats_block_form($form, &$form_state) {
+  $form = array();
+
+  $form['jurisdiction'] = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+  );
+
+  $form['jurisdiction']['level_of_govrnmnt'] = array(
+    '#type' => 'select',
+    '#title' => 'Search by Jurisdiction',
+    '#options' => registration_stats_get_options(1),
+    '#empty_option' => 'Level of Government',
+    '#ajax' => array(
+      'callback' => 'registration_stats_update_office_ajax',
+      'wrapper' => 'level-picked',
+      'event' => 'change',
+      'effect' => 'fade',
+    ),
+  );
+
+  $form['jurisdiction']['office'] = array(
+    '#type' => 'select',
+    '#options' => !empty($form_state['values']['jurisdiction']['level_of_govrnmnt']) ? registration_stats_get_options(2, $form_state['values']['jurisdiction']['level_of_govrnmnt']) : array(),
+    '#empty_option' => 'Elected Office',
+    '#prefix' => '<div id="level-picked">',
+    '#suffix' => '</div>',
+  );
+
+  $form['jurisdiction']['submit'] = array(
+    '#type' => 'submit',
+    '#name' => 'apply_jurisdiction',
+    '#value' => 'Apply',
+  );
+
+  $form['or'] = array(
+    '#markup' => '<div class="or separator">OR</div>',
+  );
+
+  $form['location'] = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+  );
+
+  $form['location']['township'] = array(
+    '#type' => 'select',
+    '#title' => 'Search by Precinct',
+    '#options' => registration_stats_get_options(3),
+    '#empty_option' => 'Township',
+    '#ajax' => array(
+      'callback' => 'registration_stats_update_precinct_ajax',
+      'wrapper' => 'township-picked',
+      'event' => 'change',
+      'effect' => 'fade',
+    ),
+  );
+
+  $form['location']['precinct'] = array(
+    '#type' => 'select',
+    '#options' => !empty($form_state['values']['location']['township']) ? registration_stats_get_options(4, $form_state['values']['location']['township']) : array(),
+    '#empty_option' => 'Precinct',
+    '#prefix' => '<div id="township-picked">',
+    '#suffix' => '</div>',
+  );
+
+  $form['location']['submit'] = array(
+    '#type' => 'submit',
+    '#name' => 'apply_location',
+    '#value' => 'Apply',
+  );
+
+  if (isset($form_state['triggering_element'])) {
+    $form['results'] = array();
+    $results = array();
+    if ($form_state['triggering_element']['#name'] == 'apply_jurisdiction') {
+      $chosen_key = drupal_encode_path(check_plain(trim($form_state['values']['jurisdiction']['office'])));
+      $chosen_display = $form['jurisdiction']['office']['#options'][$chosen_key];
+      $params = array('searchType' => 'J', 'idValue' => $chosen_key);
+      $results = voter_api_fetch_voter_search('/RegistrationStatistics/GetSummary', $params);
+    } elseif ($form_state['triggering_element']['#name'] == 'apply_location') {
+      $chosen_key = drupal_encode_path(check_plain(trim($form_state['values']['location']['precinct'])));
+      $chosen_display = $form['location']['precinct']['#options'][$chosen_key];
+      $params = array('searchType' => 'P', 'idValue' => $chosen_key);
+      $results = voter_api_fetch_voter_search('/RegistrationStatistics/GetSummary', $params);
+    }
+    if ($results['Status'] && $results['RegistrationStatistics']['VoterCount'] > 0) {
+      $form['results']['#markup'] = '<div class="votercount">There are ' . number_format($results['RegistrationStatistics']['VoterCount']) . ' Suburban Cook County registered voters in ' . $chosen_display . '</div>';
+    } else {
+      $form['results']['#markup'] = '<div class="novotercount">Sorry, we could not find any statistics for the selection you made. Please be sure the selection is in Suburban Cook County and not within Chicago City limits, or outside Cook County limits.</div>';
+    }
+  }
+
+  $form['town_lists'] = array(
+    '#type' => 'fieldset',
+  );
+  $form['town_lists']['html'] = array(
+    '#markup' => '<div class="registration-download-header"><h3>Registration Totals</h3><span>Downloadable spreadsheet files update daily.</span></div>',
+  );
+  $form['town_lists']['agency'] = array(
+    '#type' => 'submit',
+    '#name' => 'agency_download',
+    '#value' => 'Download Agency Totals',
+  );
+  $form['town_lists']['precinct'] = array(
+    '#type' => 'submit',
+    '#name' => 'precinct_download',
+    '#value' => 'Download Precinct Totals',
+  );
+
+  $form['streets'] = array(
+    '#type' => 'fieldset',
+  );
+  $form['streets']['html'] = array(
+    '#markup' => '<div class="registration-download-header"><h3>Street Index</h3><span>Downloadable spreadsheet file updates daily.</span></div>',
+  );
+  $form['streets']['street_index'] = array(
+    '#type' => 'submit',
+    '#name' => 'street_download',
+    '#value' => 'Download Street Index Totals',
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_form_validate().
+ */
+function registration_stats_block_form_validate($form, &$form_state) {
+
+}
+
+/**
+ * Implements hook_submit().
+ */
+function registration_stats_block_form_submit($form, &$form_state) {
+  $params = array();
+  // voter_api_generate_csv calls drupal_exit so no further processing will happen.
+  if ($form_state['triggering_element']['#name'] == 'agency_download') {
+    $results = voter_api_fetch_voter_search('/RegistrationStatistics/ByAgency', $params);
+    $filename = date('M-d-Y') . '-registration-totals-by-agency.csv';
+    $data = $results['AgencyStatistics'];
+    voter_api_generate_csv($data, $filename);
+  } elseif ($form_state['triggering_element']['#name'] == 'precinct_download') {
+    $results = voter_api_fetch_voter_search('/RegistrationStatistics/ByPrecinct', $params);
+    $filename = date('M-d-Y') . '-registration-totals-by-precinct.csv';
+    $data = $results['PrecinctStatistics'];
+    voter_api_generate_csv($data, $filename);
+  } elseif ($form_state['triggering_element']['#name'] == 'street_download') {
+    $results = voter_api_fetch_voter_search('/RegistrationStatistics/GetAllStreetIndex', $params);
+    $filename = date('M-d-Y') . '-registration-totals-by-street-index.csv';
+    $data = $results['StreetIndexes'];
+    voter_api_generate_csv($data, $filename);
+  }
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * This function gets api callback data and converts it into select list options.
+ */
+function registration_stats_get_options($endpoint, $param_value = NULL) {
+  $return = array();
+  switch ($endpoint) {
+    case 1:
+      $params = array();
+      $data = voter_api_fetch_voter_search('/RegistrationStatistics/GetJurisdictionTypes', $params);
+      if ($data['Status']) {
+        foreach ($data['JurisdictionTypes'] as $jurisdiction) {
+          $return[$jurisdiction['JurisdictionTypeId']] = $jurisdiction['LongName'];
+        }
+      }
+      break;
+    case 2:
+      $params = array('JurisdictionTypeId' => drupal_encode_path(check_plain(trim($param_value))));
+      $data = voter_api_fetch_voter_search('/RegistrationStatistics/GetJurisdictions', $params);
+      if ($data['Status']) {
+        foreach ($data['Jurisdictions'] as $jurisdiction) {
+          $return[$jurisdiction['TaxCode']] = $jurisdiction['LongName'];
+        }
+      }
+      break;
+    case 3:
+      $params = array();
+      $data = voter_api_fetch_voter_search('/Township/GetAll', $params);
+      if ($data['Status']) {
+        foreach ($data['Townships'] as $township) {
+          $return[$township['Code']] = $township['Name'];
+        }
+      }
+      break;
+    case 4:
+      $params = array('townshipCode' => drupal_encode_path(check_plain(trim($param_value))));
+      $data = voter_api_fetch_voter_search('/Township/GetPrecinct', $params);
+      if ($data['Status']) {
+        foreach ($data['Precincts'] as $precinct) {
+          $return[$precinct['PrecinctNum']] = $precinct['Name'];
+        }
+      }
+      break;
+  }
+
+  return $return;
+}
+
+/**
+ * Return options by ajax for Elected Offices.
+ */
+function registration_stats_update_office_ajax(&$form, &$form_state) {
+  if (!empty($form_state['values']['jurisdiction']['level_of_govrnmnt'])) {
+    $form['jurisdiction']['office']['#options'] = registration_stats_get_options(2, $form_state['values']['jurisdiction']['level_of_govrnmnt']);
+    return $form['jurisdiction']['office'];
+  }
+}
+
+/**
+ * Return options by ajax for Precincts.
+ */
+function registration_stats_update_precinct_ajax(&$form, &$form_state) {
+  if (!empty($form_state['values']['location']['township'])) {
+    $form['location']['precinct']['#options'] = registration_stats_get_options(4, $form_state['values']['location']['township']);
+    return $form['location']['precinct'];
+  }
+}

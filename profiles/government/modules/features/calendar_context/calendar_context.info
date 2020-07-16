@@ -1,0 +1,13 @@
+name = Calendar Context Day
+description = Context and placement of calendar blocks on calendar pages.
+core = 7.x
+package = Government Contexts
+version = 7.x-1.2
+dependencies[] = block
+dependencies[] = blockify
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = views
+features[context][] = calendar_day
+features[ctools][] = context:context:3
+features[features_api][] = api:2

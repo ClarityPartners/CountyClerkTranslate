@@ -1,0 +1,14 @@
+name = Government Dashboard Views
+description = Dashboard content views for the Government profile.
+core = 7.x
+package = Government
+version = 7.x-1.0-beta1
+
+dependencies[] = views
+
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = scheduled_content
+
+files[] = gov_dashboard_views.features
+files[] = gov_dashboard_views.views_default

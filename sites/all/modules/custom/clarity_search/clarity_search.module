@@ -1,0 +1,97 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+function clarity_search_block_info(){
+  $blocks = array();
+  $blocks['clarity_search'] = array(
+    'info' => t('Clarity Search Block'),
+  );
+
+  return $blocks;
+}
+
+function clarity_search_block_view($delta = ''){
+  $block = array();
+
+  switch ($delta) {
+    case 'clarity_search':
+
+      $block['content'] = array(
+        '#theme' => 'mytemplate',
+        '#type' => 'markup',
+      );
+      break;
+  }
+  return $block;
+}
+
+function clarity_search_theme() {
+  return array (
+    'mytemplate' => array (
+      'template' => 'clarity_search',
+      'path' => drupal_get_path('module', 'clarity_search') . '/',
+      'variables' => array(),
+    ),
+  );
+}
+
+//hides sticky and promote to front page options on content types
+function clarity_search_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, '_node_form') !== FALSE) {
+    unset($form['options']['sticky']);
+    unset($form['options']['promote']);
+  }
+  if ($form_id == "views_exposed_form" && isset($form_state['view'])) { //too general excluding document center
+    $view = $form_state['view'];
+    if ($view->name != 'pubs') {
+      $form['search_api_views_fulltext']['#id'] = 'form-text-' . rand(0, 100);
+    }
+  }
+}
+
+/*
+ * Implements hook_views_pre_render
+ * This displays Taxonomy term name instead of term id
+ * for solr_publication view
+ */
+
+function clarity_search_views_pre_render(&$view) {
+    if ($view->name == 'solr_publication_view') {
+        foreach ($view->result as $record) {
+            // Publication Category
+            foreach($record->sm_field_publication_categories as $key=>$pub_cat) {
+                $cat_term = $pub_cat;
+                $cat_id = explode(':', $cat_term);
+                $cat_name = taxonomy_term_load($cat_id[1]);
+                $name2 = $cat_name->name;
+                $record->sm_field_publication_categories[$key] = $name2.'  ';
+            }
+
+            // Publication Type
+            $cat_type_term = $record->sm_field_publication_type[0];
+            $cat_type_id = explode(':', $cat_type_term);
+            $cat_type_name = taxonomy_term_load($cat_type_id[1]);
+            $type_name2 = $cat_type_name->name;
+            $record->sm_field_publication_type[0] = $type_name2;
+        }
+    }
+    if ($view->name == 'primary_search_view') {
+        foreach ($view->result as $record) {
+            /*if($record->_entity_properties['type']=="video") {
+                $record->_entity_properties['title'][0] = "";
+            }*/
+            if($record->_entity_properties['type']=="publication") {
+                $record->_entity_properties['title'][0] = '<div class = pub-icon>'.$record->_entity_properties['title'][0].'</div>';
+            }
+            // Remove excerpt for location content types
+            if($record->_entity_properties['type']=="location") {
+                $record->_entity_properties['search_api_excerpt'] = "";
+            }
+        }
+    }
+}

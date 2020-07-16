@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ *  Functions to make Bootstrap 3.x compatible with Drupal.
+ */
+
+/**
+ * Overrides theme_menu_link().
+ *
+ * Makes the menu block module compatible with Bootstrap 3.x
+ *
+ */
+function gov_bootstrap_menu_link__menu_block($variables) {
+  return theme_menu_link($variables);
+}

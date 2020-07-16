@@ -1,0 +1,10 @@
+name = Homepage Jump Entityqueue
+description = homepage jump entityqueue
+core = 7.x
+package = County Clerk Entityqueue
+version = 7.x-1.1
+dependencies[] = ctools
+dependencies[] = entityqueue
+features[ctools][] = entityqueue:entityqueue_default:1
+features[entityqueue_queue][] = homepage_jump_menu
+features[features_api][] = api:2

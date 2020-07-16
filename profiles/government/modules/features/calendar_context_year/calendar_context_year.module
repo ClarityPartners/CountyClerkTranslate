@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Calendar Context Year feature.
+ */
+
+include_once 'calendar_context_year.features.inc';

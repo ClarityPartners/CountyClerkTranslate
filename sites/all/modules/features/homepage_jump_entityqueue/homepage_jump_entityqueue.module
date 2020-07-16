@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Homepage Jump Entityqueue feature.
+ */
+
+include_once 'homepage_jump_entityqueue.features.inc';

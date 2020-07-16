@@ -1,0 +1,32 @@
+//Video
+//Responsive Video Support
+
+.media-youtube-video {
+  margin: 0 auto;
+  max-width: 640px;
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+
+  @media all and (min-width: $screen-md){
+    padding-bottom: 395px;
+  }
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+//quickest fix to give client what they liked
+
+.views-row{
+  .youtube_vid{
+    iframe{
+      max-height:195px;
+    }
+  }
+}

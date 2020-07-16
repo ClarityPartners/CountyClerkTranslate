@@ -1,0 +1,15 @@
+--- imce_filefield.css
++++ imce_filefield.css
+@@ -4,6 +4,11 @@
+ a.imce-filefield-opener {
+   display: inline-block;
+   min-height: 18px;
+-  padding-left: 18px;
++  padding:6px 6px 6px 22px;
+   background: url(imce_filefield.png) no-repeat 0 50%;
++  border:1px solid #333;
++  border-radius:3px;
++  color:#FFF;
++  font-weight:bold;
++  background-color:#6C6;
+ }

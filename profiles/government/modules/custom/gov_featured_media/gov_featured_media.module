@@ -1,0 +1,500 @@
+<?php
+
+/**
+ * @file
+ * Custom field formatters for the Featured Media field.
+ */
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function gov_featured_media_field_formatter_info() {
+  $info = array(
+    'featured_media' => array(
+      'label' => t('Featured Media'),
+      'field types' => array('image', 'media'),
+      'description' => t('Displays content as a Featured Media Flexslider'),
+      'settings' => array(
+        'optionset' => 'default',
+        'image_style' => '',
+        'file_view_mode' => 'default',
+        'thumbnail_image_style' => '',
+        'caption' => FALSE,
+      ),
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ *
+ * Provides display settings form within the manage display page
+ * for our custom formatter. Code adapted from flexslider_fields module
+ */
+function gov_featured_media_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $form = array();
+
+  // Show select box for the option set
+  $optionsets = array();
+  ctools_include('export');
+  foreach (flexslider_optionset_load_all() as $name => $optionset) {
+    $optionsets[$name] = check_plain($optionset->title);
+  }
+
+  $form['optionset'] = array(
+    '#title' => t('Option set'),
+    '#type' => 'select',
+    '#options' => $optionsets,
+    '#default_value' => $settings['optionset'],
+    '#description' => t('The flexslider optionset to use. Image styles from this option set will be used for images'),
+  );
+
+  $image_styles = image_style_options(FALSE, PASS_THROUGH);
+  $form['image_style'] = array(
+    '#title' => t('Image style'),
+    '#type' => 'select',
+    '#default_value' => $settings['image_style'],
+    '#empty_option' => t('None (original image)'),
+    '#options' => $image_styles,
+    '#description' => t('The image style to use for the main flexslider images.'),
+  );
+
+  $form['file_view_mode'] = array(
+    '#title' => t('File View Mode'),
+    '#type' => 'select',
+    '#default_value' => $settings['file_view_mode'],
+    '#empty_option' => t('None (original image)'),
+    '#options' => file_entity_view_mode_labels(),
+    '#description' => t('The File view mode to use for non-image files'),
+  );
+
+  $form['thumbnail_image_style'] = array(
+    '#title' => t('Thumbnail Image style'),
+    '#type' => 'select',
+    '#default_value' => $settings['thumbnail_image_style'],
+    '#empty_option' => t('None (original image)'),
+    '#options' => $image_styles,
+    '#description' => t('The image style to use for the flexslider thumbnails if the flexslider option set selected above uses thumbnails'),
+  );
+
+  $form['caption'] = array(
+    '#title' => t('Enable Captions for images'),
+    '#type' => 'checkbox',
+    '#default_value' => $settings['caption'],
+    '#description' => t('For Images, enable to display the Title text and Description as a caption.'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ *
+ * Displays the summary of the set options of a flexslider/featured medid formatted image field
+ */
+function gov_featured_media_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  // Load option set
+  ctools_include('export');
+  if (!empty($settings['optionset'])) {
+    $o = flexslider_optionset_load($settings['optionset']);
+    if ($o !== NULL) {
+      $optionset = $o;
+    }
+  }
+
+  // Display the selected image style
+  if (!empty($settings['file_view_mode'])) {
+    $is = t('File view mode: %fileviewmode', array('%fileviewmode' => $settings['file_view_mode']));
+  }
+  else {
+    $is = t('File view mode: default');
+  }
+
+  // Build settings summary
+  $optionset = isset($optionset) ? $optionset->title : t('Default settings');
+  $summary[] = t('Option set: %optionset', array('%optionset' => $optionset));
+  $summary[] = $is;
+
+  return implode('<br />', $summary);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function gov_featured_media_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  //Add custom flexslider js
+  drupal_add_js(drupal_get_path('module', 'gov_featured_media') . '/js/gov_featured_media.js');
+
+  $element = array();
+
+  $view_mode = $display['settings']['file_view_mode'];
+
+  $recursion_queue = &drupal_static(__FUNCTION__, array());
+
+  // If no 'referencing entity' is set, we are starting a new 'reference
+  // thread' and need to reset the queue.
+  // @todo Bug: $entity->referencing_entity on files referenced in a different
+  // thread on the page.
+  // E.g: 1 references 1+2 / 2 references 1+2 / visit homepage.
+  // We'd need a more accurate way...
+  if (!isset($entity->referencing_entity)) {
+    $recursion_queue = array();
+  }
+
+  // The recursion queue only needs to track files.
+  if ($entity_type == 'file') {
+    list($id) = entity_extract_ids($entity_type, $entity);
+    $recursion_queue[$id] = $id;
+  }
+
+  // Prevent 'empty' fields from causing a WSOD.
+  $items = array_filter($items);
+  $files = array();
+  $images = array();
+
+  foreach ($items as $delta => $item) {
+
+    //If the item is an image, render as an image like in
+    //Flexslider.fields.module. Otherwise,
+    //Render as a file
+    if ($item['type'] == 'image') {
+      //Do stuff
+      if (isset($item['item'])) {
+        continue;
+      }
+      $tmp = $item;
+      $item = array();
+      $item['item'] = $tmp;
+
+      // Setup the variables for calling theme_image_style
+      if (isset($item['item']['uri'])) {
+        $item['slide']['path'] = $item['item']['uri'];
+      }
+      if (isset($display['settings']['image_style'])) {
+        $item['slide']['style_name'] = $display['settings']['image_style'];
+      }
+      if (isset($item['item']['width'])) {
+        $item['slide']['width'] = $item['item']['width'];
+      }
+      if (isset($item['item']['height'])) {
+        $item['slide']['height'] = $item['item']['height'];
+      }
+      if (isset($item['item']['alt'])) {
+        $item['slide']['alt'] = $item['item']['alt'];
+      }
+      if (isset($item['item']['title'])) {
+        $item['slide']['title'] = $item['item']['title'];
+      }
+
+      // Render the slide item
+      // If not style set, we have to call theme_image since theme_image_style
+      // doesn't auto-fallback to full size image
+      if (!empty($item['slide']['style_name'])) {
+        // Generate the HTML for the slide]d
+        $item['slide'] = theme('image_style', $item['slide']);
+      }
+      else {
+        // Generate the HTML for the slide
+        $item['slide'] = theme('image', $item['slide']);
+      }
+
+      // Check caption settings
+      if ($display['settings']['caption']) {
+        $item['caption'] = filter_xss($item['item']['title']);
+      }
+
+      $images[$delta] = $item;
+
+    }
+    else {
+
+      $file_display = array();
+      //Render as file a la file_entity.field.inc
+      if (!isset($recursion_queue[$item['fid']])) {
+        $item['include_thumbnail'] = TRUE; //@todo remove this
+        $file_display[$delta] = file_load($item['fid']);
+        if (!empty($item['description'])) {
+          $file_display[$delta]->description = $item['description'];
+        }
+      }
+
+      if ($file_display) {
+        $output = file_view_multiple($file_display, 'default');
+        // Remove the first level from the output array.
+        $files_built = reset($output);
+      }
+
+      //Add enablejsapi parameter to the video url parameters
+      // so that we can pause the video with javascript when the flexslider
+      // slide transitions.
+      $rendered_video = drupal_render($files_built);
+      $rendered_video = str_replace('feature=oembed', 'feature=oembed&enablejsapi=1', $rendered_video);
+
+      $files[$delta] = array(
+        'item' => $items[$delta],
+        'slide' => $rendered_video,
+      );
+    }
+  }
+
+  //Reinitialize items as combined images and files
+  $items = $images + $files;
+  ksort($items);
+
+  //Render the flexslider
+  $slideshow = array();
+  foreach ($items as $delta => $item) {
+    $slideshow[$delta] = $item;
+
+    // Convert item into an entity to grab the description field
+    $file_object = new stdClass();
+    foreach ($item['item'] as $key => $value) {
+      $file_object->$key = $value;
+    }
+
+    if ($file_object->type == 'image' && array_key_exists('field_media_description', $item['item'])) {
+      if ($item['item']['field_media_description'] != NULL) {
+        $caption = array();
+        $caption['title'] = field_view_field('file', $file_object, 'field_file_image_title_text');
+        $caption['description'] = field_view_field('file', $file_object, 'field_media_description');
+        $caption['title']['#weight'] = -1;
+        $slideshow[$delta]['caption'] = drupal_render($caption);
+      }
+    }
+  }
+
+  if (!empty($slideshow)) {
+    $element = array(
+      '#theme' => 'featured_media_flexslider',
+      '#items' => $slideshow,
+      '#settings' => $display['settings'],
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_theme()
+ */
+function gov_featured_media_theme($existing, $type, $theme, $path) {
+  return array(
+    'flexslider_thumbnail_list' => array(
+      'variables' => array('items' => array(), 'settings' => array()),
+      'function' => 'gov_featured_media_flexslider_thumbnail_list',
+    ),
+
+    'featured_media_flexslider' => array(
+      'variables' => array('items' => array(), 'settings' => array()),
+      'template' => 'theme/featured_media_flexslider',
+      'file' => 'theme/featured_media_flexslider.theme.inc',
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function gov_featured_media_theme_registry_alter(&$theme_registry) {
+
+  $module_path = drupal_get_path('module', 'gov_featured_media');
+
+  // if (isset($theme_registry['flexslider'])) {
+  //   $theme_registry['flexslider']['theme path'] = $module_path;
+  //   $theme_registry['flexslider']['template'] = $module_path . '/theme/flexslider';
+  // }
+  if (isset($theme_registry['flexslider_list'])) {
+    $theme_registry['flexslider_list']['theme path'] = $module_path;
+    $theme_registry['flexslider_list']['function'] = 'gov_featured_media_flexslider_list';
+  }
+  if (isset($theme_registry['flexslider_list_item'])) {
+    $theme_registry['flexslider_list_item']['theme path'] = $module_path;
+    $theme_registry['flexslider_list_item']['function'] = 'gov_featured_media_flexslider_list_item';
+  }
+}
+
+/**
+ * Implements hook_js_alter
+ */
+function gov_featured_media_js_alter(&$javascript) {
+  unset($javascript['sites/all/modules/flexslider/assets/js/flexslider.load.js']);
+  drupal_add_js(drupal_get_path('module', 'gov_featured_media') . '/js/gov_featured_media.load.js');
+}
+
+/**
+ * Theme override for theme_flexslider_list
+ */
+function gov_featured_media_flexslider_list(&$vars) {
+  // Reference configuration variables
+  $optionset = &$vars['settings']['optionset'];
+  $thumbnail_image_style = &$vars['settings']['thumbnail_image_style'];
+  $items = &$vars['items'];
+  $attributes = &$vars['settings']['attributes'];
+  $type = &$vars['settings']['type'];
+  $output = '';
+
+  // Build the list
+  if (!empty($items)) {
+    $output .= "<$type" . drupal_attributes($attributes) . '>';
+    foreach ($items as $i => $item) {
+
+      $caption = '';
+      if (!empty($item['caption'])) {
+        $caption = $item['caption'];
+      }
+
+      $output .= theme('flexslider_list_item', array(
+        'item' => $item['slide'],
+        'settings' => array(
+          'optionset' => $optionset,
+          'thumbnail_image_style' => $thumbnail_image_style,
+        ),
+        'caption' => $caption,
+        'file' => isset($item['item']) ? $item['item'] : '',
+      ));
+    }
+    $output .= "</$type>";
+  }
+
+  return $output;
+}
+
+/**
+ * Theme function for thumbnail list
+ */
+function gov_featured_media_flexslider_thumbnail_list(&$vars) {
+  // Reference configuration variables
+  $optionset = &$vars['settings']['optionset'];
+  $thumbnail_image_style = &$vars['settings']['thumbnail_image_style'];
+  $items = &$vars['items'];
+  $attributes = &$vars['settings']['attributes'];
+  $attributes['id'] = $attributes['id'] . '-thumbnails';
+  unset($attributes['class']);
+  $attributes['class'][] = 'slides';
+  $type = &$vars['settings']['type'];
+  $output = '';
+
+  // Build the list
+  if (!empty($items)) {
+    $output .= "<$type" . drupal_attributes($attributes) . '>';
+    foreach ($items as $i => $item) {
+
+      unset($item['slide']);
+
+      if ($item['item']['type'] == 'image') {
+        if (isset($item['item']['uri'])) {
+          $item['slide']['path'] = $item['item']['uri'];
+        }
+      }
+      else {
+        if (isset($item['item']['metadata']['media_oembed_local_thumbnail_path'])) {
+          $item['slide']['path'] = $item['item']['metadata']['media_oembed_local_thumbnail_path'];
+        }
+      }
+      if (isset($thumbnail_image_style)) {
+        $item['slide']['style_name'] = $thumbnail_image_style;
+      }
+      if (isset($item['item']['width'])) {
+        $item['slide']['width'] = $item['item']['width'];
+      }
+      if (isset($item['item']['height'])) {
+        $item['slide']['height'] = $item['item']['height'];
+      }
+      if (isset($item['item']['alt'])) {
+        $item['slide']['alt'] = $item['item']['alt'];
+      }
+      if (isset($item['item']['title'])) {
+        $item['slide']['title'] = $item['item']['title'];
+      }
+
+      if ($item['item']['type'] == 'video') {
+        $item['class'] = array('video');
+      }
+
+      $item['slide'] = theme('image_style', $item['slide']);
+
+
+      $output .= theme('flexslider_list_item', array(
+        'item' => $item['slide'],
+        'settings' => array(
+          'optionset' => 'default',
+          'class' => $item['class'],
+        ),
+      ));
+    }
+    $output .= "</$type>";
+  }
+
+  return $output;
+}
+
+/**
+ * Theme override for theme_flexslider_list_item
+ */
+function gov_featured_media_flexslider_list_item(&$vars) {
+  return '<li' . drupal_attributes($vars['settings']['attributes']) . '>' . $vars['item'] . $vars['caption'] . "</li>\n";
+}
+
+/**
+ * Process function for flexslider_list_item
+ */
+function gov_featured_media_process_flexslider_list_item(&$vars) {
+  // Reset the list of attributes
+  $vars['settings']['attributes'] = array();
+
+  // Reference configuration variables
+  $item = &$vars['item'];
+  $settings = &$vars['settings'];
+  $caption = &$vars['caption'];
+  $attributes = &$vars['settings']['attributes'];
+  $file = $vars['file'];
+  $thumbnail_image_style = &$vars['settings']['thumbnail_image_style'];
+
+  if (isset($vars['settings']['class'])) {
+    if (in_array('video', $vars['settings']['class'])) {
+      $vars['settings']['attributes']['class'][] = 'video-thumb';
+    }
+  }
+
+  // // Generated thumbnail support
+  // if (isset($settings['optionset']->options['controlNav']) and $settings['optionset']->options['controlNav'] === "thumbnails") {
+
+  //   // If the file is an image, then generate the thumbnail from the file URI (using thumbnail image style)
+  //   if($file['type'] == 'image'){
+  //     if($thumbnail_image_style){
+  //       $attributes['data-thumb'] = image_style_url($thumbnail_image_style, $file['uri']);
+  //     } else {
+  //       $attributes['data-thumb'] = file_create_url($file['uri']);
+  //     }
+  //   } else {
+  //     //Else, generate the thumbnail from the metadata
+  //     if($thumbnail_image_style){
+  //       $attributes['data-thumb'] = image_style_url($thumbnail_image_style, $file['metadata']['media_oembed_local_thumbnail_path']);
+  //     } else {
+  //       $attributes['data-thumb'] = file_create_url($file['metadata']['media_oembed_local_thumbnail_path']);
+  //     }
+  //   }
+  // }
+
+  if (isset($settings['optionset']->options['thumbCaptions']) and $settings['optionset']->options['thumbCaptions'] and !empty($caption)) {
+    $attributes['data-thumbcaption'] = $caption;
+    // Prevent captions from appearing in the slider as well
+    if (isset($settings['optionset']->options['thumbCaptionsBoth']) and FALSE === $settings['optionset']->options['thumbCaptionsBoth']) {
+      $caption = '';
+    }
+  }
+
+  if (!empty($caption)) {
+    $caption = '<div class="flex-caption">' . $caption . '</div>';
+  }
+}

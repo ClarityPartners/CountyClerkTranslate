@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Government News Content feature.
+ */
+
+include_once 'gov_news_content.features.inc';

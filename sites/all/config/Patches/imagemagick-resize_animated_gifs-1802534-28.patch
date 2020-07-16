@@ -1,0 +1,38 @@
+diff --git a/imagemagick.module b/imagemagick.module
+index 804338f..4a3d596 100644
+--- a/imagemagick.module
++++ b/imagemagick.module
+@@ -201,9 +201,16 @@ function _imagemagick_check_path($file) {
+  * @see image_resize()
+  */
+ function image_imagemagick_resize(stdClass $image, $width, $height) {
++  if ($image->info['mime_type'] == 'image/gif') {
++    $image->ops[] = '-coalesce';
++    $image->ops[] = '-repage 0x0';
++  }
+   $image->ops[] = '-resize ' . (int) $width . 'x' . (int) $height . '!';
+   $image->info['width'] = $width;
+   $image->info['height'] = $height;
++  if ($image->info['mime_type'] == 'image/gif') {
++    $image->ops[] = '+repage';
++  }
+   return TRUE;
+ }
+ 
+@@ -267,9 +274,16 @@ function image_imagemagick_crop(stdClass $image, $x, $y, $width, $height) {
+   // Even though the crop effect in Drupal core does not allow for negative
+   // offsets, ImageMagick supports them. Also note: if $x and $y are set to
+   // NULL then crop will create tiled images so we convert these to ints.
++  if ($image->info['mime_type'] == 'image/gif') {
++    $image->ops[] = '-coalesce';
++    $image->ops[] = '-repage 0x0';
++  }
+   $image->ops[] = sprintf('-crop %dx%d%+d%+d!', $width, $height, $x, $y);
+   $image->info['width'] = $width;
+   $image->info['height'] = $height;
++  if ($image->info['mime_type'] == 'image/gif') {
++    $image->ops[] = '+repage';
++  }
+   return TRUE;
+ }
+ 

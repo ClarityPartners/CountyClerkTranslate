@@ -1,0 +1,700 @@
+<?php
+/**
+ * Implements hook_menu.
+ */
+function doeo_menu() {
+  $items = [];
+
+  $items['voter/doeo'] = [
+    'title' => 'Directory of Elected Officials',
+    'description' => 'Directory of Elected Officials.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['doeo_page_form'],
+    'access callback' => TRUE,
+  ];
+
+  // This page will update the urls and credentials for various endpoints.
+  $items['admin/config/voter-api-settings/doeo-download'] = [
+    'title' => 'DOEO Settings',
+    'description' => 'Download DOEO spreadsheet here.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['doeo_admin_form'],
+    'access arguments' => ['administer_voter_api_settings'],
+    'type' => MENU_LOCAL_TASK,
+  ];
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function doeo_theme() {
+  return [
+    'doeo' => [
+      'variables' => ['doeo' => NULL],
+      'function' => 'doeo_theme_doeo',
+      'file' => 'doeo.theme.inc',
+    ],
+    'doeo_results' => [
+      'variables' => ['doeo' => NULL],
+      'function' => 'doeo_theme_doeo_results',
+      'file' => 'doeo.theme.inc',
+    ],
+    'elected_official' => [
+      'variables' => ['elected_official' => NULL],
+      'function' => 'doeo_theme_elected_official',
+      'file' => 'doeo.theme.inc',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function doeo_block_info() {
+  $blocks['doeo'] = [
+    'info' => t('DOEO block'),
+    'cache' => DRUPAL_NO_CACHE,
+  ];
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * @param string $delta
+ *
+ * @return array
+ */
+function doeo_block_view($delta = '') {
+  $block = [];
+
+  switch ($delta) {
+    case 'doeo':
+      $block['subject'] = '';
+      $block['content'] = drupal_get_form('doeo_page_form');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Doeo admin page form.
+ */
+function doeo_admin_form() {
+  $form = array();
+  $form['download'] = array(
+    '#type' => 'submit',
+    '#name' => 'download',
+    '#value' => 'Download DOEO CSV',
+  );
+
+  return $form;
+}
+
+/**
+ * Validates doeo admin form
+ *
+ * @param $form
+ * @param $form_state
+ */
+function doeo_admin_form_validate ($form, &$form_state) {
+
+}
+
+/**
+ * Submission for doeo admin form.
+ *
+ * @param $form
+ * @param $form_state
+ */
+function doeo_admin_form_submit ($form, &$form_state) {
+  if (isset($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == 'download') {
+    // voter_api_generate_csv calls drupal_exit so no further processing will happen.
+    $params = array();
+    $results = voter_api_fetch_voter_search('/ElectedOfficial/Get', $params);
+    $data = $results['data'];
+    $officials = doeo_flatten_officials($data);
+    $filename = date('M-d-Y') . '-doeo-full.csv';
+    voter_api_generate_csv($officials, $filename);
+  }
+}
+
+/**
+ * This function  generates the output for the main DOEO page.
+ *
+ * @param $form
+ * @param $form_state
+ *
+ * @return array
+ */
+function doeo_page_form($form, &$form_state) {
+  $jurisdiction_levels = [
+    'Federal' => 'Federal',
+    'State' => 'State',
+    'County' => 'County',
+    'Local' => 'Local',
+  ];
+
+  $form = [];
+
+  $form['form-buttons'] = [
+    '#markup' => '<div class="option-1 doeo-options"><div class="option-container"><span>Option</span><span>1</span></div><span class="option-1-address doeo-description">By Address</span></div>
+    <div class="option-2 doeo-options"><div class="option-container"><span>Option</span><span>2</span></div><span class="option-2-levels doeo-description">By Level of Government</span></div>
+    <div class="option-3 doeo-options"><div class="option-container"><span>Option</span><span>3</span></div><span class="option-3-name doeo-description">By Name</span></div>',
+    '#prefix' => '<div class="doeo-button-wrapper">',
+    '#suffix' => '</div>',
+  ];
+
+  $form['label-byaddress'] = [
+    '#type' => 'markup',
+    '#prefix' => '<div class="doeo-wrap address">',
+    '#markup' => '<div class="doeo-label address"><div class="option-container"><span>Option</span><span>1</span></div><span class="option-1-address doeo-description">By Address</span></div>',
+    '#suffix' => '',
+  ];
+
+  $form['byaddress'] = [
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+  ];
+
+  $form['byaddress']['housenumber'] = [
+    '#type' => 'textfield',
+    '#title' => 'House Number<span class="required">*</span>',
+  ];
+
+  $form['byaddress']['direction'] = [
+    '#type' => 'select',
+    '#options' => ['N' => 'N', 'E' => 'E', 'S' => 'S', 'W' => 'W'],
+    '#empty_option' => '--',
+    '#title' => 'Direction',
+  ];
+
+  $form['byaddress']['street'] = [
+    '#type' => 'textfield',
+    '#title' => 'Street<span class="required">*</span>',
+  ];
+
+  $form['byaddress']['zipcode'] = [
+    '#type' => 'textfield',
+    '#title' => 'Zip Code<span class="required">*</span>',
+  ];
+
+  $form['byaddress']['submit'] = [
+    '#type' => 'submit',
+    '#value' => 'Show Results',
+    '#name' => 'search-byaddress',
+    '#prefix' => '<div class="button-wrapper">',
+    '#suffix' => '</div></div>',
+    '#ajax' => [
+      'event' => 'click',
+      'callback' => 'doeo_ajax_voter',
+      'wrapper' => 'doeo-ajax-wrapper',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ],
+  ];
+
+  $form['byaddress']['download'] = [
+    '#type' => 'submit',
+    '#value' => 'Download Spreadsheet',
+    '#name' => 'byaddress_csv',
+  ];
+
+  $form['label-levels'] = [
+    '#markup' => '<div class="doeo-label levels"><div class="option-container"><span>Option</span><span>2</span></div><span class="option-2-levels doeo-description">By Level of Government</span></div>',
+    '#prefix' => '<div class="doeo-wrap levels">',
+  ];
+
+  $form['levels'] = [
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+  ];
+
+  $form['levels']['level'] = [
+    '#type' => 'select',
+    '#options' => $jurisdiction_levels,
+    '#empty_option' => '--',
+    '#title' => 'Level of Government',
+    '#ajax' => [
+      'callback' => 'doeo_ajax_type_callback',
+      'wrapper' => 'level-picked',
+      'event' => 'change',
+      'effect' => 'fade',
+    ],
+  ];
+
+  $level_default = [0 => 'Choose a Jurisdiction'];
+  $form['levels']['type'] = [
+    '#type' => 'select',
+    '#options' => !empty($form_state['values']['levels']['level']) ? $level_default + doeo_get_jurisdiction_type_options($form_state['values']['levels']['level']) : [],
+    '#empty_option' => 'Pick a Level First',
+    '#title' => 'Jurisdiction',
+    '#prefix' => '<div id="level-picked">',
+    '#suffix' => '</div>',
+    '#ajax' => [
+      'callback' => 'doeo_ajax_tax_code_callback',
+      'wrapper' => 'type-picked',
+      'event' => 'change',
+      'effect' => 'fade',
+    ],
+  ];
+
+  $tax_code_default = ['all' => 'All'];
+  $form['levels']['tax_code'] = [
+    '#type' => 'select',
+    '#options' => !empty($form_state['values']['levels']['type']) ? $tax_code_default + doeo_get_tax_code_options($form_state['values']['levels']['type']) : [],
+    '#empty_option' => 'Pick a level and Jurisdiction first',
+    '#title' => 'District',
+    '#prefix' => '<div id="type-picked">',
+    '#suffix' => '</div>',
+  ];
+
+  $form['levels']['submit'] = [
+    '#type' => 'submit',
+    '#name' => 'by-level',
+    '#value' => 'Show Results',
+    '#prefix' => '<div class="button-wrapper">',
+    '#suffix' => '</div></div>',
+    '#ajax' => [
+      'event' => 'click',
+      'callback' => 'doeo_ajax_voter',
+      'wrapper' => 'doeo-ajax-wrapper',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ],
+  ];
+
+  $form['levels']['download'] = [
+    '#type' => 'submit',
+    '#value' => 'Download Spreadsheet',
+    '#name' => 'bylevel_csv',
+  ];
+
+
+  $form['label-search'] = [
+    '#prefix' => '<div class="doeo-wrap officials">',
+    '#markup' => '<div class="doeo-label officials"><div class="option-container"><span>Option</span><span>3</span></div><span class="option-3-name doeo-description">By Name</span></div>',
+    '#suffix' => '',
+  ];
+
+  $form['search'] = [
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+  ];
+
+  $form['search']['needle'] = [
+    '#type' => 'textfield',
+    '#title' => 'Name To Search For',
+  ];
+
+  $form['search']['submit'] = [
+    '#type' => 'submit',
+    '#name' => 'needle',
+    '#value' => 'Show Results',
+    '#prefix' => '<div class="button-wrapper">',
+    '#suffix' => '</div></div>',
+    '#ajax' => [
+      'event' => 'click',
+      'callback' => 'doeo_ajax_voter',
+      'wrapper' => 'doeo-ajax-wrapper',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ],
+  ];
+
+  $form['search']['download'] = [
+    '#type' => 'submit',
+    '#value' => 'Download Spreadsheet',
+    '#name' => 'byname_csv',
+  ];
+
+  $form['officials'] = [
+    '#markup' => '',
+    '#prefix' => '<div id="doeo-ajax-wrapper">',
+    '#suffix' => '</div>',
+  ];
+
+  if (isset($form_state['triggering_element'])) {
+    $clicked_button = $form_state['triggering_element']['#name'];
+    drupal_add_js(drupal_get_path('module', 'voter_api') . '/js/jQuery.print.js');
+    drupal_add_js(drupal_get_path('module', 'voter_api') . '/js/voter_api.js');
+    drupal_add_js(['voterApi' => ['pollingPlaceFound' => 0]], 'setting');
+    drupal_add_js(['voterApi' => ['clickedTab' => $clicked_button]], 'setting');
+    if ($clicked_button == 'search-byaddress') {
+      // User submitted a address search.
+      $raw_params = $form_state['values']['byaddress'];
+      $params = [];
+      foreach ($raw_params as $key => $value) {
+        if ($value != 'Submit') {
+          $params[$key] = check_plain(trim($value));
+        }
+      }
+
+      $voters = voter_api_fetch_voter_search('/voter/byAddress', $params);
+
+      if ($voters['Status']) {
+        if (isset($voters['Voters'][0]['PrecinctNumber'])) {
+          $cache_name = 'doeo_precinct_cache_' . $voters['Voters'][0]['PrecinctNumber'] . $voters['Voters'][0]['PrecinctSplitId'];
+          if ($cache = cache_get($cache_name)) {
+            $officials = $cache->data;
+          }
+          else {
+            $resource = '/ElectedOfficial/GetByPrecinctSplit';
+            $params = [
+              'precinctNumber' => $voters['Voters'][0]['PrecinctNumber'],
+              'split' => $voters['Voters'][0]['PrecinctSplitId'],
+            ];
+
+            $officials_data = voter_api_fetch_voter_search($resource, $params);
+            $officials = $officials_data['data'];
+            cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+          }
+          $processed_officials = doeo_clean_officials($officials);
+          $form['officials']['#markup'] = theme('doeo', ['doeo' => $processed_officials]);
+        }
+      }
+    }
+    elseif ($clicked_button == 'by-level') {
+      // User submitted a by level search.
+      $tax_code = $form_state['values']['levels']['tax_code'];
+      $level_type = $form_state['values']['levels']['type'];
+      if ($tax_code == 'all') {
+        $cache_name = 'doeo_tax_code_cache_' . $level_type;
+      } else {
+        $cache_name = 'doeo_tax_code_cache_' . $tax_code;
+      }
+      if ($cache = cache_get($cache_name)) {
+        $officials = $cache->data;
+      }
+      else {
+        $params = [];
+        if ($tax_code == 'all') {
+          $resource = '/ElectedOfficial/GetByJurisdictionType/' . $level_type;
+        } else {
+          $resource = '/ElectedOfficial/GetByTaxCode/' . $tax_code;
+        }
+        $officials_data = voter_api_fetch_voter_search($resource, $params);
+        $officials = $officials_data['data'];
+        cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+      }
+
+      $processed_officials = doeo_clean_officials($officials);
+
+      $form['officials']['#markup'] = theme('doeo_results', ['doeo' => $processed_officials]);
+    }
+    elseif ($clicked_button == 'needle') {
+      // User submitted a name search.
+      $name = strtolower($form_state['values']['search']['needle']);
+      $cache_name = 'doeo_name_cache_' . $name;
+      if ($cache = cache_get($cache_name)) {
+        $officials = $cache->data;
+      }
+      else {
+        $resource = '/ElectedOfficial/GetByName/' . $name;
+        $params = [];
+        $officials_data = voter_api_fetch_voter_search($resource, $params);
+        $officials = $officials_data['data'];
+        cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+      }
+      $processed_officials = doeo_clean_officials($officials);
+      $form['officials']['#markup'] = theme('doeo_results', ['doeo' => $processed_officials]);
+    }
+    if (empty($form['officials']['#markup'])) {
+      $form['officials']['#markup'] = '<div class="error"><span>No Results Found</span>Sorry, but we could not find the records you requested.</div>';
+    }
+  }
+
+  return $form;
+}
+
+function doeo_ajax_voter($form, $form_state) {
+  //needed ajax
+  $form_state['rebuild'] = TRUE;
+
+  $form['officials']['#prefix'] = '<div id="doeo-ajax-wrapper">' . theme('status_messages');
+
+  form_clear_error();
+  return $form['officials'];
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function doeo_page_form_validate($form, &$form_state) {
+  form_clear_error();
+  if (isset($form_state['triggering_element'])) {
+    if ($form_state['triggering_element']['#name'] == 'search-byaddress') {
+      // validate byaddress form instance.
+      // TODO: see if this can be generalized.
+      $errors = voter_api_validate_byaddress_form($form_state['values']['byaddress'], 'byaddress');
+      foreach ($errors as $element => $message) {
+        form_set_error($element, $message);
+      }
+    }
+    if ($form_state['triggering_element']['#name'] == 'needle') {
+      if (empty($form_state['values']['search']['needle'])) {
+        form_set_error('search][needle', 'Please enter a name to search for.');
+      }
+      if (strlen($form_state['values']['search']['needle']) < 3) {
+        form_set_error('search][needle', 'Please enter at least 3 letters to match against.');
+      }
+    }
+  }
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function doeo_page_form_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+  if (isset($form_state['triggering_element'])) {
+    $clicked_button = $form_state['triggering_element']['#name'];
+    // voter_api_generate_csv calls drupal_exit so no further processing will happen
+    if ($clicked_button == 'byaddress_csv') {
+      // User submitted a address search.
+      $raw_params = $form_state['values']['byaddress'];
+      $params = [];
+      foreach ($raw_params as $key => $value) {
+        if ($value != 'Submit') {
+          $params[$key] = check_plain(trim($value));
+        }
+      }
+
+      $voters = voter_api_fetch_voter_search('/voter/byAddress', $params);
+      if ($voters['Status']) {
+        if (isset($voters['Voters'][0]['PrecinctNumber'])) {
+          $cache_name = 'doeo_precinct_cache_' . $voters['Voters'][0]['PrecinctNumber'] . $voters['Voters'][0]['PrecinctSplitId'];
+          if ($cache = cache_get($cache_name)) {
+            $officials = $cache->data;
+          }
+          else {
+            $resource = '/ElectedOfficial/GetByPrecinctSplit';
+            $params = [
+              'precinctNumber' => $voters['Voters'][0]['PrecinctNumber'],
+              'split' => $voters['Voters'][0]['PrecinctSplitId'],
+            ];
+
+            $officials_data = voter_api_fetch_voter_search($resource, $params);
+            $officials = $officials_data['data'];
+            cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+          }
+        }
+        $filename = 'elected_officials_by_address.csv';
+        $officials = doeo_flatten_officials($officials);
+        voter_api_generate_csv($officials, $filename);
+      }
+      form_set_error('housenumber', 'We could not find the address you entered. Please make sure the address is entered correctly.');
+    }
+    elseif ($clicked_button == 'bylevel_csv') {
+      // User submitted a by level search.
+      $tax_code = $form_state['values']['levels']['tax_code'];
+      $level_type = $form_state['values']['levels']['type'];
+      if ($tax_code == 'all') {
+        $cache_name = 'doeo_tax_code_cache_' . $level_type;
+      } else {
+        $cache_name = 'doeo_tax_code_cache_' . $tax_code;
+      }
+      if ($cache = cache_get($cache_name)) {
+        $officials = $cache->data;
+      }
+      else {
+        $params = [];
+        if ($tax_code == 'all') {
+          $resource = '/ElectedOfficial/GetByJurisdictionType/' . $level_type;
+        } else {
+          $resource = '/ElectedOfficial/GetByTaxCode/' . $tax_code;
+        }
+        $officials_data = voter_api_fetch_voter_search($resource, $params);
+        $officials = $officials_data['data'];
+        cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+      }
+      $filename = 'elected_officials_by_jurisdiction.csv';
+      $officials = doeo_flatten_officials($officials);
+      voter_api_generate_csv($officials, $filename);
+    }
+    elseif ($clicked_button == 'byname_csv') {
+      // User submitted a name search.
+      $name = strtolower($form_state['values']['search']['needle']);
+      $cache_name = 'doeo_name_cache_' . $name;
+      if ($cache = cache_get($cache_name)) {
+        $officials = $cache->data;
+      }
+      else {
+        $resource = '/ElectedOfficial/GetByName/' . $name;
+        $params = [];
+        $officials_data = voter_api_fetch_voter_search($resource, $params);
+        $officials = $officials_data['data'];
+        cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+      }
+      $filename = 'elected_officials_by_search.csv';
+      $officials = doeo_flatten_officials($officials);
+      voter_api_generate_csv($officials, $filename);
+    }
+  }
+}
+
+
+/**
+ * get jurisdiction types from api.
+ *
+ * @param null $level
+ *
+ * @return array
+ */
+function doeo_get_jurisdiction_type_options($level = NULL) {
+  $return = [];
+  if ($level) {
+    $resource = '/JurisdictionType/GetByJurisdictionLevel/' . $level;
+    $params = [];
+    $results_data = voter_api_fetch_voter_search($resource, $params);
+    $results = $results_data['data'];
+    foreach ($results as $result) {
+      $return[$result['Id']] = $result['LongDescription'];
+    }
+  }
+
+  return $return;
+}
+
+/**
+ * get jurisdiction types from api.
+ *
+ * @param null $type
+ *
+ * @return array
+ */
+function doeo_get_tax_code_options($type = NULL) {
+  $return = [];
+  if ($type) {
+    $resource = '/Jurisdiction/GetByJurisdictionType/' . $type;
+    $params = [];
+    $results_data = voter_api_fetch_voter_search($resource, $params);
+    $results = $results_data['data'];
+    foreach ($results as $result) {
+      $return[$result['TaxCode']] = $result['LongDescription'];
+    }
+  }
+
+  return $return;
+}
+
+/**
+ * returns an ajax response to a form.
+ *
+ * @param $form
+ * @param $form_state
+ *
+ * @return mixed
+ */
+function doeo_ajax_type_callback(&$form, &$form_state) {
+  if (!empty($form_state['values']['levels']['level'])) {
+    $level_default = [0 => 'Choose a Jurisdiction'];
+    $form_state['rebuild'] = TRUE;
+    $form['levels']['type']['#options'] = $level_default + doeo_get_jurisdiction_type_options($form_state['values']['levels']['level']);
+  }
+
+  return $form['levels']['type'];
+}
+
+
+/**
+ * returns an ajax response to a form.
+ *
+ * @param $form
+ * @param $form_state
+ *
+ * @return mixed
+ */
+function doeo_ajax_tax_code_callback(&$form, &$form_state) {
+  if (!empty($form_state['values']['levels']['type'])) {
+    $form_state['rebuild'] = TRUE;
+    $tax_code_default = ['all' => 'All'];
+    $form['levels']['tax_code']['#options'] = $tax_code_default + doeo_get_tax_code_options($form_state['values']['levels']['type']);
+  }
+
+  return $form['levels']['tax_code'];
+}
+
+/**
+ * This function cleans official objects for the doeo.
+ *
+ * @param $officials
+ *
+ * @return array
+ */
+function doeo_clean_officials($officials) {
+  $processed_officials = [];
+  if (is_array($officials)) {
+    foreach ($officials as $index => $official) {
+      $official['full_name'] = '';
+      if (!empty($official['FirstName'])) {
+        $official['full_name'] .= $official['FirstName'];
+      }
+      if (!empty($official['MiddleName'])) {
+        $official['full_name'] .= ' ' . $official['MiddleName'];
+      }
+      if (!empty($official['LastName'])) {
+        $official['full_name'] .= ' ' . $official['LastName'];
+      }
+      if ($official['LastElected'] == 'Appointed' || $official['TermAppointed'] == 0) {
+        $official['LastElected'] = 'N/A';
+        $official['NextElection'] = 'N/A';
+        // set next election and term to N/A
+      }
+      else {
+        $official['LastElected'] = date('F Y', strtotime($official['LastElected']));
+        if (!empty($official['NextElection'])) {
+          $official['NextElection'] = date('Y', strtotime($official['NextElection']));
+        }
+      }
+      $processed_officials[$official['JurisdictionTypeId']][] = $official;
+    }
+  }
+
+  return $processed_officials;
+}
+
+/**
+ * This function flattens an elected official for sending to csv file.
+ *
+ * @param $officials
+ *
+ * @return array
+ */
+function doeo_flatten_officials($officials) {
+  $return = array();
+  $address_keys = array(
+    "Address1",
+    "Address2",
+    "City",
+    "State",
+    "Zip",
+    "Phone",
+    "Fax",
+    "URL",
+    "Email",
+  );
+  $remove_columns = array('JurisdictionLevel', 'JurisdictionTypeId', 'JurisdictionType');
+  foreach ($officials as $index => $official) {
+    foreach ($official as $name => $value) {
+      if (is_array($value)) {
+        for ($i = 0; $i <= 1; $i++) {
+          // We ned to make sure we are returning two addresses even if two aren't set.
+          foreach ($address_keys as $address_key) {
+            $new_array_key = $address_key . '_' . ($i + 1);
+            $return[$index][$new_array_key] = isset($value[$i]) ? $value[$i][$address_key] : null;
+          }
+        }
+      } elseif (!in_array($name, $remove_columns)) {
+        $return[$index][$name] = $value;
+      }
+    }
+  }
+
+  return $return;
+}

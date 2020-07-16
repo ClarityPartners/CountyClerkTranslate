@@ -1,0 +1,6 @@
+name = Registration Stats integration
+description = Integrate registration stats api.
+core = 7.x
+package = Clarity
+version = 7.x-1.0
+dependencies[] = voter_api

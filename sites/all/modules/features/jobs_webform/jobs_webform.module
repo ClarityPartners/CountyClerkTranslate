@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Jobs Webform feature.
+ */
+
+include_once 'jobs_webform.features.inc';

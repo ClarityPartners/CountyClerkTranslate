@@ -1,0 +1,229 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Feb 24, 2017, 10:22:47 AM
+    Author     : delion
+*/
+
+.home-card{
+    background-size: cover;
+    background-repeat: no-repeat;
+    height:auto;
+
+    @media (min-width:$screen-lg-min){
+        min-height:360px;
+    }
+
+    &.paragraph .content {
+        padding-top: 20px;
+        padding-bottom: 20px;
+
+        .para-content .field-name-field-body {
+            margin-top: 20px;
+            margin-bottom: 20px;
+
+            // election fix - restyle info box
+            background-color: #bdc3c7;
+            padding: 10px;
+            border-radius: 5px;
+
+            p {
+                color: #c0392b;
+            }
+
+            a {
+                color: blue;
+            }
+        }
+    }
+}
+.paragraph{
+    .content{
+        padding:20px;
+        color:#FFF;
+
+        .para-content{
+            @include make-xs-column(12);
+            @include make-md-column(6);
+            @include make-lg-column(6);
+            clear:both;
+
+            a{
+                @include montserratBold;
+                color:#FFF;
+                @include font-size(1.6);
+                text-transform:uppercase;
+
+                &:after{
+                    @include fontawesome-icon();
+                    content:"\f054";
+                    padding-left:5px;
+                    text-decoration: none;
+                }
+            }
+            .field-name-field-title{
+
+               @include font-size(3.5);
+               @include montserratBold;
+               text-transform: uppercase;
+               line-height: 1em;
+            }
+            .field-name-field-body{
+                @include font-size(2.0);
+                @include lora;
+                font-style: italic;
+                margin:2em 0;
+                line-height: 1.3em;
+            }
+        }
+        .para-search{
+           @include make-xs-column(12);
+           @include make-lg-column(6);
+           @extend .hidden-xs;
+
+           .views-exposed-widgets{
+
+                //& > div{
+                    display: table;
+
+                    .views-exposed-widget{
+                        display:table-cell;
+                        width:100%;
+                        vertical-align: top;
+                        float: none;
+                        padding:0;
+
+                        .input-group{
+                            @extend .row;
+                            display: block;
+
+                            .input-group-addon{display:none;}
+                        }
+                    }
+                    .input-group-addon{
+                        display:none;
+                    }
+                    .form-control,
+                    .btn-primary{
+                        height:48px;
+                        border-radius:0;
+                    }
+                    .btn-info{
+                        background-color:$btngreen-color;
+                        border:none;
+                        padding:12px 20px;
+                        @include font-size(.2);
+                        color:$btngreen-color;
+                        width:55px;
+                        margin-top:0;
+                        border-radius: 0;
+                        vertical-align: top;
+
+                        &:hover{
+                            background-color:#47542e;
+                        }
+                        .icon{
+                            display:none;
+                        }
+                        &:before{
+                            @include fontawesome-icon();
+                            content:"\f002";
+                            color:#FFF;
+                            @include font-size(1.8);
+                        }
+                    }
+                //}
+           }
+           /*.views-exposed-widgets{
+            display: table;
+
+            @media (min-width:$screen-md-min){
+                padding:20px 0;
+            }
+            .views-exposed-widget{
+                display:table-cell;
+                vertical-align: top;
+                padding:0;
+                float:none;
+
+                .input-group-addon{
+                    display:none;
+                }
+                .btn-info{
+                    margin:0;
+                    border-radius: 0;
+                    background-color:$btngreen-color;
+                    color:$btngreen-color;
+                    padding: 5px;
+                    width: 35px;
+                    overflow: hidden;
+
+                    &:before{
+                        @include fontawesome-icon();
+                        content:"\f002";
+                        color:#FFF;
+                        @include font-size(1.6);
+                        padding-left:4px;
+                    }
+                }
+                input{
+                    border-radius: 0;
+                }
+            }
+        }*/
+
+            @media (max-width:$screen-md-min){
+                padding:30px 15px;
+            }
+        }
+
+        .field-name-field-basic-body {
+            margin: 10px auto;
+            max-width: 80%;
+            clear: both;
+
+            @media(min-width:$screen-md-min){
+                width: 50%;
+                display: inline-block;
+            }
+
+            img {
+                display: block;
+                max-width: 100%;
+                height: auto !important;
+                margin: 0 auto;
+            }
+
+            .media_embed {
+                // Commented-out code makes video responsive and keeps aspect ratio intact.
+                // Un-commented-out code lets content manager control the height and width, but "black bars" may show up.
+                //position: relative;
+                //width: 100%;
+                //margin: 0 auto;
+                //height: 0;
+                //padding-bottom: 56%;
+
+                iframe {
+                    //position: absolute;
+                    //width: 100%;
+                    //height: 100%;
+                    //left: 0;
+                    //top: 0;
+                    margin: 0 auto;
+                    display: block;
+                    max-width: 100%;
+                }
+            }
+       }
+
+        @media (min-width:$screen-md-min){
+            padding:50px 0;
+        }
+        @media (min-width:$screen-lg-min){
+            //transform: perspective(1px) translateY(25%);
+        }
+    }
+}

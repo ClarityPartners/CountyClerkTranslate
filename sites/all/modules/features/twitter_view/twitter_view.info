@@ -1,0 +1,11 @@
+name = Twitter view
+description = twitter view on frontpage
+core = 7.x
+package = County Clerk Views
+version = 7.x-1.3
+dependencies[] = twitter
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = twitter
+features_exclude[dependencies][ctools] = ctools

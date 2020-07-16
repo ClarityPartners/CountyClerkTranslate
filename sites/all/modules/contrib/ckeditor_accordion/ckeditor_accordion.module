@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Implements hook_ckeditor_plugin().
+ * Hook to register the CKEditor plugin - it would appear in the plugins list on the profile setting page.
+ */
+function ckeditor_accordion_ckeditor_plugin() {
+  return array(
+    'accordion' => array(
+      // Name of the plugin used to write it.
+      'name' => 'accordion',
+      // Description of the plugin - it would be displayed in the plugins management section of profile settings.
+      'desc' => t('CKEditor Accordion - A plugin to easily create accordions'),
+      // The full URL to the CKEditor plugins directory, with the trailing slash.
+      'path' => base_path() . drupal_get_path('module', 'ckeditor_accordion') . '/plugins/accordion/',
+      'buttons' => array(
+        'Accordion' => array(
+          // Path to an icon relative to the plugins folder.
+          'icon' => 'icons/accordion.png',
+          'label' => 'Accordion',
+        )
+      )
+    )
+  );
+}

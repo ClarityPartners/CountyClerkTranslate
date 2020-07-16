@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Custom function to clear cache upon report upload.
+ */
+
+/**
+ * Implements hook_node_insert().
+ *
+ * Clear caches after a new Report has been uploaded
+ *
+ */
+function gov_reports_node_insert($node) {
+
+  if ($node->type == "report") {
+    drupal_flush_all_caches();
+  }
+
+}

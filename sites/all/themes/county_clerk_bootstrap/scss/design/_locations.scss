@@ -1,0 +1,136 @@
+/*
+    Created on : Jun 22, 2017, 9:53:21 AM
+    Author     : delion
+*/
+
+@import 'comp';
+//main container
+.location-page{
+    padding-left:0;
+    padding-right:0;
+
+    .view-header h1{padding:0;}
+    //location map
+    #no-padding.map-load{
+        height: 70vh;
+        padding:0 15px 0 0; //override
+        //height:100%;
+        align-items: stretch;
+
+        .gmap-map{
+            z-index:9;
+        }
+    }
+}
+//location filters
+.location-filters{
+
+    .views-exposed-widget{
+        float:none;
+
+        .form-checkboxes{
+            height:auto;
+            border:none;
+            box-shadow: none;
+
+            .form-control{
+                height:auto;
+                width:auto;
+                border:none;
+                display:inline-block;
+            }
+        }
+    }
+    #edit-combine-wrapper{
+        border-bottom: 1px solid #eee;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+
+        input{
+            border-radius: 0;
+        }
+    }
+}
+//location body
+.location-items{
+    height: -webkit-calc(70vh - 237px);
+    height:    -moz-calc(70vh - 237px);
+    height:         calc(70vh - 237px);
+    height: -webkit-calc(70vh - 237px);
+    height:    -moz-calc(70vh - 237px);
+    height:         calc(70vh - 237px);
+    //height: 50vh - 237px;
+    overflow-x: hidden;
+    border-top:1px solid #eee;
+
+    .location-map{
+        .views-row{
+            padding:5px 0;
+
+            ul{
+                padding-left:0;
+                li{
+                    display:block;
+                }
+            }
+            a{
+                //color:#333;
+                font-weight:600;
+                @include font-size(1.5);
+            }
+            .location.vcard{
+                float:left;
+                clear:both;
+            }
+            .location-city{
+                clear:both;
+            }
+        }
+    }
+}
+
+.loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: 0px 0 0 -40px;
+}
+//location content type
+.container.location{
+    padding:0;
+
+    .location-body{
+        padding-bottom:25px;
+    }
+    .locations{
+        padding:10px 0;
+
+        &.phone{
+            padding:0;
+        }
+        &.address{
+            .street-address{
+                font-weight:600;
+
+                .additional{
+                    display:block;
+                }
+            }
+        }
+        &.services{
+            text-transform: capitalize;
+
+            .field-item{
+                display: list-item;
+                margin-left: 20px;
+                text-decoration: underline;
+                &:hover{
+                    text-decoration: underline;
+                }
+            }
+        }
+        &.phone{
+            .field-name-field-phone-type{display:none;}
+        }
+    }
+}

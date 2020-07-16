@@ -1,0 +1,197 @@
+h1 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 35px;
+    font-size: 3.5rem;
+    overflow-wrap: break-word;
+    color: #333; }
+    h1.hero-title {
+      color: #FFF; }
+
+  h2 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 24px;
+    font-size: 2.4rem;
+    color: #333; }
+
+  h3 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 22px;
+    font-size: 2.2rem;
+    color: #333; }
+
+  h4 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 18px;
+    font-size: 1.8rem;
+    color: #333; }
+
+  h5 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 15px;
+    font-size: 1.5rem;
+    color: #333; }
+
+  h6 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 14px;
+    font-size: 1.4rem;
+    color: #333; }
+
+    .election-name{
+      clear:both;
+      text-align:center;
+      font-weight:700;
+      font-size:18px;
+    }
+
+    .race{
+        padding:15px 0;
+        clear:both;
+        width:45%;
+        padding-left:0;
+        padding-right:0;
+        padding-bottom:5px;
+        display:inline-block;
+        margin:0 5px;
+        vertical-align: top;
+    }
+    .election-name.referendum{
+        margin-top:20px;
+    }
+    .race-title, .referendum-title{
+        font-size: 14px;
+        /*font-size: 1.1rem;*/
+        text-decoration: underline;
+        font-weight: 700;
+        /*float:left;*/
+    }
+    .referendum-header .name,
+    .referendum-header .ballot-save{
+        display:none;
+    }
+    .referendum-title{
+        padding-bottom:10px;
+    }
+    .term-data{
+        font-size:14px;
+        display:inline-block;
+        font-weight: 700;
+        /*text-decoration: underline;*/
+    }
+    .candidates{
+        padding-top:10px;
+    }
+    .candidate-header{display:none;}
+    .candidate-header div,
+    .candidate-row div,
+    .candidate-row .ballot-save{
+        /*float: left;
+        width: 20%;*/
+        display:inline-block;
+        padding-left:0;
+        padding-right:0;
+        margin:0;
+        position: relative;
+    }
+    .ballot-save input{
+        display:none;
+    }
+    .candidate-row .name{
+        clear:left;
+    }
+    .candidate-row,
+    .referendum-row{
+        font-size:12px;
+    }
+    .candidate-row .name::before{
+        display: inline-block;
+        content: '';
+        margin-right:10px;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        height: 0.55rem;
+        width: 0.55rem;
+        /*margin-right: 0.5rem;*/
+        background-color: #FFF;
+        border:1px solid #000;
+    }
+    .candidate-row .name::after{
+        content:', ';
+        white-space: pre;
+    }
+    .candidate-row .party::after{
+        content:', ';
+        white-space: pre;
+    }
+    .candidate-row .ballot-number::before{
+        content:' Ballot #';
+    }
+    .jurisdiction-group-label{
+        padding: 10px 0;
+        /*border-bottom:1px solid #333;*/
+    }
+    .jurisdiction-nav-group{
+        float: left;
+        width: 48.33333%;
+    }
+    .jurisdiction-label{
+        font-size: 1.6rem;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+    .official-title{
+        font-weight:700;
+        clear:both;
+    }
+    .official-box{
+        height:inherit !important;
+        width:100% !important;
+    }
+    .official-body{
+        /*float: left;
+        width: 48.33333%;*/
+        position: relative;
+        float:none;
+        clear:both;
+    }
+    .official-addresses,
+    .election-dates{
+        text-align: left;
+        padding-left:0;
+    }
+    .box{
+        display:inline-block;
+        width:50%;
+        clear:both;
+        padding:5px 0;
+    }
+    .box *[class*='label']{
+        text-decoration: underline;
+        vertical-align: top;
+        display:inline-block;
+        padding-right:5px;
+    }
+    .box *[class*='detail']{
+        display:inline-block;
+        vertical-align: top;
+    }
+    /*.official-title,
+    .official-body{
+        width:100%;
+        display: block;
+    }*/
+    #statementDiv{
+        display:none;
+    }

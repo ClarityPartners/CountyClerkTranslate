@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Broadcast Type feature.
+ */
+
+include_once 'broadcast_type.features.inc';

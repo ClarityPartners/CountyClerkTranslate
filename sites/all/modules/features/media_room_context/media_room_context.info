@@ -1,0 +1,11 @@
+name = Media Room
+description = Media room hero image
+core = 7.x
+package = County Clerk Context
+version = 7.x-1.0
+dependencies[] = bean
+dependencies[] = context
+dependencies[] = ctools
+features[context][] = hero_media_room
+features[ctools][] = context:context:3
+features[features_api][] = api:2

@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * Implements hook_schema.
+ */
+function voter_api_schema() {
+  $schema['voter_api_tab'] = array(
+    'description' => 'The base table for voter api tabs.',
+    'fields' => array(
+      'vapiid' => array(
+        'description' => 'The primary key for a voter api tab.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'Machine name of this tab.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'search_type' => array(
+        'description' => 'The type of search form to display in this tab.',
+        'type' => 'varchar',
+        'length' => 12,
+        'default' => 'byaddress',
+      ),
+      'title' => array(
+        'description' => 'The display name for this tab.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => 'Unnamed Tab',
+      ),
+      'active_state' => array(
+        'description' => 'Active state for this tab.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'initial_html' => array(
+        'description' => 'The html to display on initial page load.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'results_html' => array(
+        'description' => 'The html to display when we found a record.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'empty_html' => array(
+        'description' => 'The html to display when no record is found.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'error_html' => array(
+        'description' => 'The html to display when there is an error.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'initial_footer' => array(
+        'description' => 'The html to display at the bottom of the tab on initial page load.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'results_footer' => array(
+        'description' => 'The html to display at the bottom of the tab after search.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'error_footer' => array(
+        'description' => 'The html to display when there is an error.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+      'empty_footer' => array(
+        'description' => 'The html to display when there is an error.',
+        'type' => 'varchar',
+        'length' => 2000,
+        'default' => '',
+      ),
+    ),
+    'unique keys' => array(
+      'name' => array('name'),
+    ),
+    'primary key' => array('vapiid'),
+  );
+  return $schema;
+}

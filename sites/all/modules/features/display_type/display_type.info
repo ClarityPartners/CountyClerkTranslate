@@ -1,0 +1,17 @@
+name = Display Type
+description = landing page taxonomy
+core = 7.x
+package = County Clerk Taxonomies
+version = 7.x-1.1
+dependencies[] = taxonomy
+dependencies[] = uuid
+dependencies[] = uuid_features
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2
+features[taxonomy][] = display_type
+features[uuid_term][] = 5d6f0fa2-b4e7-4b28-af3f-ae072fa15913
+features[uuid_term][] = 72113e4a-8b0d-4cea-9653-9604ad60e772
+features[variable][] = pathauto_taxonomy_term_display_type_pattern
+features_exclude[dependencies][ctools] = ctools
+features_exclude[dependencies][features] = features
+features_exclude[dependencies][strongarm] = strongarm

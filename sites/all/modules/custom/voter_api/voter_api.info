@@ -1,0 +1,5 @@
+name = DOTNET Api integration
+description = Integration tools for .net api endpoints.
+core = 7.x
+package = Clarity
+version = 7.x-1.0

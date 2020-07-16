@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the News & Events sidebar feature.
+ */
+
+include_once 'news_events_sidebar.features.inc';

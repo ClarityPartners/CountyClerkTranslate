@@ -1,0 +1,59 @@
+<?php
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+function clarity_switch_get_views_display_switch() { //media room
+
+  $switch = l(t('Grid'), 'media-library-grid', array(
+    'query' => drupal_get_query_parameters(), // This ensures the view will keep filter settings when switching the display.
+    'attributes' => array(
+      'class' => array('page-grid-switch') // Adding a css class for this link.
+    )
+  ));
+  //$switch .= ' | ';
+  $switch .= l(t('List'), 'media-library-list', array(
+    'query' => drupal_get_query_parameters(),
+    'attributes' => array(
+      'class' => array('page-list-switch')
+    )
+  ));
+
+  // Adding CSS class for whole switch.
+  $switch = "<div class='page-display-switch'>" . $switch . "</div>";
+  return $switch;
+}
+function clarity_switch_get_views_pub_display_switch() { //document center
+
+  $switch = l(t('Grid'), 'publications', array(
+    'query' => drupal_get_query_parameters(), // This ensures the view will keep filter settings when switching the display.
+    'attributes' => array(
+      'class' => array('page-grid-switch') // Adding a css class for this link.
+    )
+  ));
+  //$switch .= ' | ';
+  $switch .= l(t('List'), 'publications/list', array(
+    'query' => drupal_get_query_parameters(),
+    'attributes' => array(
+      'class' => array('page-list-switch')
+    )
+  ));
+
+  // Adding CSS class for whole switch.
+  $switch = "<div class='pub-display-switch'>" . $switch . "</div>";
+  return $switch;
+}
+
+function clarity_switch_views_pre_view(&$view, &$display_id, &$args) {
+  //if ($view->name == 'media_room' && $display_id == 'page' || $display_id == 'page_1') {
+
+ if ($view->name == 'media_room'){
+   //dpm($view->display_handler->default_display->display->display_options['exposed_form']);
+   // Adds a display switch to the header of a view.
+    // 'footer' as second parameter will add the display switch to the footer of the view instead.
+    //$view->add_item($display_id, 'header', 'views', 'area', array('content' => clarity_switch_get_views_display_switch(), 'format' => 'full_html'));
+  }
+}

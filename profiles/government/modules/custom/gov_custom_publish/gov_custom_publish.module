@@ -1,0 +1,244 @@
+<?php
+
+
+/**
+ * @file
+ *  Functions to enable custom publishing functionality for the governemnt profile.
+ */
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensures that this modules workbench create alter hook runs after all the others
+ *
+ */
+function gov_custom_publish_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'workbench_create_alter') {
+    $group = $implementations['gov_custom_publish'];
+    unset($implementations['gov_custom_publish']);
+    $implementations['gov_custom_publish'] = $group;
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ *
+ * Edit views query to pull both related and sitewide broadcasts
+ *
+ */
+
+function gov_custom_publish_views_query_alter(&$view, &$query) {
+
+  //add array of nids allowed by user access id 
+  /*
+    if($view->name == 'entity_reference_list_by_section'){
+      global $user;
+      $uid = $user->uid;
+      $results = db_select('workbench_access_user', 'wau')
+        ->fields('wau',array('access_id'))
+        ->condition('wau.uid', $uid, '=')
+        ->execute()
+        ->fetchAllAssoc('access_id');
+
+      $results = array_pop($results);
+      foreach($results as $result){
+          $tid = $result;
+          if($tid == 'agency_hierarchy'){
+            $tid = '322';
+          }
+        }
+      $children = taxonomy_get_children_all($tid, $vid = 18);
+      $access_ids = array();
+      $access_ids[$tid] = $tid;
+
+      foreach ($children as $term){
+        $access_ids[$term->tid] = $term->tid;
+      }
+      $access_ids = array_keys($access_ids);
+
+      $join = new views_join();
+      $join->table = 'field_data_field_editorial_group_assignment';
+      $join->field = 'entity_id';
+      $join->left_table = 'node';
+      $join->left_field = 'nid';
+      $join->type = 'left';
+
+      $query->add_relationship('field_data_field_editorial_group_assignment', $join, 'node');
+      $query->add_where(0,'field_data_field_editorial_group_assignment.field_editorial_group_assignment_tid',$access_ids,'IN');
+
+    }
+   */
+//Control publication of broadcasts locally and sitewide
+  if ($view->name == 'broadcast' && $view->current_display == 'broadcast') {
+
+    if (menu_get_object()) { //this is a node page
+      $node = menu_get_object();
+      $nid = $node->nid;
+      $query->add_table('field_data_field_page_parent', $relationship = NULL, $join = NULL, $alias = NULL);
+      $query->add_table('field_data_field_published_status', $relationship = NULL, $join = NULL, $alias = NULL);
+      //display broadcast if we are on a related page or if broadcast has sitewide status
+      $or = db_or()
+        ->condition('field_data_field_page_parent.field_page_parent_target_id', $nid, '=')
+        ->condition('field_data_field_published_status.field_published_status_value', 'publish_sitewide', '=');
+      $query->add_where(0, $or);
+    }
+    else { //not a node page; display only broadcasts with sitewide status
+      $query->add_table('field_data_field_published_status', $relationship = NULL, $join = NULL, $alias = NULL);
+      $query->add_where(2, 'field_data_field_published_status.field_published_status_value', 'publish_sitewide', '=');
+    }
+  }
+}
+
+//function for getting all children, grandchildren, etc from tid
+//http://stackoverflow.com/questions/21986633/how-to-get-all-taxonomy-children-id-in-drupal
+
+function taxonomy_get_children_all($tid, $vid = 0, $key = 'tid') {
+  $c = taxonomy_get_children($tid, $vid, $key);
+  $result = array();
+  foreach ($c as $t => $d) {
+    $result[$t] = $d;
+    $below = taxonomy_get_children_all($t, $vid, $key);
+    if (!empty($below)) {
+      foreach ($below as $nt => $nd) {
+        $result[$nt] = $nd;
+      }
+    }
+  }
+  return $result;
+}
+
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Customize node edit form
+ *
+ */
+
+function gov_custom_publish_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['#node_edit_form']) && $form['#node_edit_form'] == TRUE) {
+    if (!empty($form['type'])) {
+      if ($form['type']['#value']) {
+        $type = $form['type']['#value'];
+        $form['options']['promote']['#access'] = FALSE;
+        $form['options']['sticky']['#access'] = FALSE;
+
+        if ($type) {
+          switch ($type) {
+            case 'news':
+              $form['options']['promote']['#access'] = TRUE;
+              $promote = $form['options']['promote'];
+              $promote['#title'] = 'Publish to front page';
+              //hide Promote to Frontpage checkbox
+              $form['options']['promote']['#access'] = FALSE;
+
+              $form['field_request_frontpage'] = array(
+                '#type' => 'fieldset',
+                '#title' => 'Request publication to front page',
+                '#collapsible' => TRUE,
+                '#collapsed' => TRUE,
+                '#group' => 'additional_settings',
+                'promote' => $promote,
+                '#weight' => 96,
+              );
+
+              break;
+            case 'i_want_to':
+              $form['options']['sticky']['#access'] = TRUE;
+              $form['options']['sticky']['#title'] = 'Sticky at top of menu list';
+              break;
+
+          }
+        }
+      }
+
+      if (!user_access('publish to frontpage')) {
+
+      }
+      $form['#submit'][] = 'gov_custom_publish_form_submit_handler';
+    }
+
+
+  }
+
+
+}
+
+function gov_custom_publish_form_submit_handler($form, &$form_state) {
+
+  //$form_state['values']['promote'] = $form_state['input']['promote'];
+  //error_log(print_r($form_state['input']['promote'],true));
+}
+
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Customize Broadcast node edit form
+ *
+ */
+
+function gov_custom_publish_form_broadcast_node_form_alter(&$form, &$form_state, $form_id) {
+
+  //hide Promote to Frontpage checkbox
+  $form['options']['promote']['#access'] = FALSE;
+
+  //move field_published_status to vertical tab group
+  $publish_status = $form['field_published_status'];
+  $form['field_published_group'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Sitewide Publishing Status',
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    'sitewide' => $publish_status,
+    '#weight' => 96,
+  );
+
+  $form['field_published_status']['#access'] = FALSE;
+  $options = $form['field_published_status'][LANGUAGE_NONE]['#options'];
+  $form['field_published_group']['sitewide'][LANGUAGE_NONE]['#title_display'] = 'invisible';
+
+
+  if (!user_access('publish broadcasts sitewide')) {
+    //for users without sitewide publish permission
+    if ($form['field_published_status'][LANGUAGE_NONE]['#default_value'] == 'publish_sitewide') { //if broadcast is currently sitewide, disable radio buttons and print notice
+      $form['field_published_group']['sitewide'][LANGUAGE_NONE]['#description'] = '<h3>Broadcast is currently selected to publish sitewide. This setting can\'t be changed.</h3>';
+      $form['field_published_group']['sitewide']['#disabled'] = TRUE;
+    }
+    else { //hide sitewide option
+      $form['field_published_group']['sitewide'][LANGUAGE_NONE]['#description'] = 'Broadcasts are published locally to Related Pages by default. Request or (if allowed) enable sitewide publication by choosing one of the available options.';
+      $form['field_published_group']['sitewide']['#disabled'] = FALSE;
+      unset($options['publish_sitewide']);
+    }
+  }
+  $form['field_published_group']['sitewide'][LANGUAGE_NONE]['#options'] = $options;
+
+  $form['#submit'][] = 'gov_custom_publish_broadcast_node_form_submit_handler';
+
+}
+
+function gov_custom_publish_broadcast_node_form_submit_handler($form, &$form_state) {
+  $form_state['values']['field_published_status'][LANGUAGE_NONE][0]['value'] = $form_state['input']['sitewide'][LANGUAGE_NONE];
+}
+
+
+function gov_custom_publish_permission() {
+  //create permissions for sitewide publishing and moderation
+  $permissions = array();
+  $permissions['use sitewide workbench tab'] = array(
+    'title' => t('Use "Sitewide" workbench tab'),
+  );
+  $permissions['publish broadcasts sitewide'] = array(
+    'title' => t('Publish Broadcasts Sitewide'),
+  );
+  //create permission for frontpage workbench tab
+  $permissions['use frontpage news workbench tab'] = array(
+    'title' => t('Use "Frontpage News Status" workbench tab'),
+  );
+  $permissions['publish to frontpage'] = array(
+    'title' => t('Publish to Front Page'),
+  );
+
+  return $permissions;
+}

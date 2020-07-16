@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the County Clerk Workbench feature.
+ */
+
+include_once 'county_clerk_workbench.features.inc';

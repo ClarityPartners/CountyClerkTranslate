@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the I Want To Content Type feature.
+ */
+
+include_once 'i_want_to_content_type.features.inc';

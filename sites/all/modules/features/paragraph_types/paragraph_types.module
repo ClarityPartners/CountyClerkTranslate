@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Paragraph Types feature.
+ */
+
+include_once 'paragraph_types.features.inc';

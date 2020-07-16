@@ -1,0 +1,17 @@
+name = Event Context
+description = event node type context
+core = 7.x
+package = County Clerk Context
+version = 7.x-1.1
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = event_content_type
+dependencies[] = fe_block
+dependencies[] = features
+dependencies[] = filefield_paths
+dependencies[] = strongarm
+dependencies[] = views
+features[context][] = events_sidebar
+features[ctools][] = context:context:3
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2

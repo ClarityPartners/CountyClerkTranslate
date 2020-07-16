@@ -1,0 +1,208 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Sitewide Message module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function gov_sitewide_message_install() {
+  $t = get_t();
+
+// Make sure a sitewide message content type doesn't already exist
+  if (!in_array('gov_sitewide_message', node_type_get_names())) {
+    $type = array(
+      'type' => 'gov_sitewide_message',
+      'name' => st('Sitewide Message'),
+      'base' => 'node_content',
+      'description' => st("A message that will be displayed in a specific region on every page."),
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+      'title_label' => 'Message Title'
+    );
+
+    $type = node_type_set_defaults($type);
+    node_type_save($type);
+
+  }
+  _gov_sitewide_message_add_custom_fields();
+
+  //Create variables.
+  $variables = array(
+    'gov_sitewide_message_autohide',
+    'gov_sitewide_message_autohide_seconds',
+    'gov_sitewide_message_color_bg',
+    'gov_sitewide_message_color_text',
+    'gov_sitewide_message_color_link'
+  );
+  foreach ($variables as $name) {
+    variable_set($name, NULL);
+  }
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function gov_sitewide_message_uninstall() {
+
+  // Remove content type and the fields created.
+  $content_type = 'gov_sitewide_message';
+  $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+  $result = db_query($sql, array(':type' => $content_type));
+  $nodeids = array();
+  foreach ($result as $row) {
+    $nodeids[] = $row->nid;
+  }
+  node_delete_multiple($nodeids);
+  _gov_sitewide_message_delete_custom_fields();
+  node_type_delete($content_type);
+  field_purge_batch(500);
+
+  $path = 'admin/config/system/sitewide-message';
+  menu_link_delete($path);
+ // redirect_delete_by_path($path);
+
+  $module = 'gov_sitewide_message';
+  $clear = 'UPDATE system SET schema_version = 7000 WHERE name = :module';
+  db_query($clear, array(':module' => $module));
+
+  // Clear the cache tables.
+  cache_clear_all('*', 'cache', TRUE);
+  cache_clear_all('*', 'cache_filter', TRUE);
+  cache_clear_all('*', 'cache_menu', TRUE);
+  cache_clear_all('*', 'cache_page', TRUE);
+
+
+  // Delete variables.
+  $variables = array(
+    'gov_sitewide_message_autohide',
+    'gov_sitewide_message_autohide_seconds',
+    'gov_sitewide_message_color_bg',
+    'gov_sitewide_message_color_text',
+    'gov_sitewide_message_color_link'
+  );
+  foreach ($variables as $name) {
+    variable_del($name);
+  }
+}
+
+/**
+ * Add custom fields.
+ *
+ */
+function _gov_sitewide_message_add_custom_fields() {
+  foreach (_gov_sitewide_message_installed_fields() as $field) {
+    field_create_field($field);
+  }
+  foreach (_gov_sitewide_message_installed_instances() as $fieldinstance) {
+    $fieldinstance['entity_type'] = 'node';
+    $fieldinstance['bundle'] = 'gov_sitewide_message';
+    field_create_instance($fieldinstance);
+  }
+}
+
+/**
+ * Return the field definitions.
+ */
+function _gov_sitewide_message_installed_fields() {
+  $t = get_t();
+  return array(
+    'gov_sitewide_message_text' => array(
+      'translatable' => '0',
+      'entity_types' => array(),
+      'settings' => array(
+        'max_length' => 800,
+      ),
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
+      ),
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
+      ),
+      'field_name' => 'gov_sitewide_message_text',
+      'type' => 'text_long',
+      'module' => 'text',
+      'active' => '1',
+      'locked' => '0',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'bundles' => array(
+        'node' => array(
+          'page',
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Returns the field instances.
+ */
+function _gov_sitewide_message_installed_instances() {
+  $t = get_t();
+  // Position in the question and answer page. Body (text) is 0 and Teaser (Title) is -4.
+  return array(
+    'gov_sitewide_message_text' => array(
+      'label' => 'Message Text',
+      'settings' => array(
+        'text_processing' => 1,
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'rows' => 3,
+        ),
+        'type' => 'text_textarea',
+        'weight' => 4,
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 1,
+        ),
+        'teaser' => array(
+          'label' => 'hidden',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 1,
+        ),
+      ),
+      'required' => 0,
+      'description' => 'Enter message text.',
+      'default_value' => NULL,
+      'field_name' => 'gov_sitewide_message_text',
+      'entity_type' => 'node',
+      'bundle' => 'page',
+      'deleted' => '0',
+    ),
+  );
+}
+
+/**
+ * Cleanup custom fields on uninstall.
+ */
+function _gov_sitewide_message_delete_custom_fields() {
+  foreach (array_keys(_gov_sitewide_message_installed_fields()) as $field) {
+    field_delete_field($field);
+  }
+  $instances = field_info_instances('node', 'gov_sitewide_message');
+  foreach ($instances as $instance_name => $fieldinstance) {
+    field_delete_instance($fieldinstance);
+  }
+}

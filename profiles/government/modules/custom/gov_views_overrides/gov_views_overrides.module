@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Custom functions to override Views behaviors for the government profile.
+ */
+
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Prevents the RESET button on an exposed view from redirecting to the homepage
+ *
+ */
+function gov_views_overrides_form_views_exposed_form_alter(&$form, &$form_state) {
+  // SOURCE: http://julian.pustkuchen.com/node/659
+  // ------------------------------------------------------------
+  // Add an own reset button to all views exposed forms. The reason behind is,
+  // that the default Drupal reset button doesn't play nice with AJAX
+  // and jumps back to the front page because of URL problems. So it's unusable for us.
+  //
+  // Add class to make it better selectable in JS and CSS
+  $form['submit']['#attributes'] = array('class' => array('my-views-filter-submit'));
+  $submit_btn_id = $form['submit']['#id'];
+  if (!empty($submit_btn_id) && !empty($form['reset'])) {
+    // Add own reset button
+    $form['submit']['#suffix'] = '</div><div class="views-exposed-widget views-reset-button"><button onclick="javascript:jQuery(this.form).clearForm();jQuery(this.form).find(\'#' . $submit_btn_id . '\').trigger(\'click\');return false;" class="btn btn-default form-submit ico-remove form-reset my-views-filter-reset" id="edit-reset" name="op">' . t('Reset') . '</button>';
+    // Remove the original RESET button.
+    unset($form['reset']);
+  }
+}

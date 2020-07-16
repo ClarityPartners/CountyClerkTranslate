@@ -1,0 +1,12 @@
+name = Government Sitewide Message
+core = 7.x
+package = Government
+description = Adds a message that will be displayed in a specific region on every page.
+
+dependencies[] = color
+dependencies[] = context
+
+configure = admin/config/system/sitewide-message
+project = "gov_sitewide_message"
+files[] = plugins/gov_sitewide_message_context_reaction_add.inc
+

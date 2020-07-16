@@ -1,0 +1,9 @@
+<?php
+
+function linkit_autocomplete_query_linkit_node_autocomplete_alter(QueryAlterableInterface $query) {
+
+  $orderby =& $query->getOrderBy();
+  $orderby = array(
+    'node.created' => 'DESC',
+  );
+}

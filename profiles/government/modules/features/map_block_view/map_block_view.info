@@ -1,0 +1,10 @@
+name = Map Block View
+description = A view that turns a location field into a contextual map block
+core = 7.x
+package = Government Views
+version = 7.x-1.0-beta4
+dependencies[] = ctools
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = map_block

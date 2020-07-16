@@ -1,0 +1,10 @@
+name = Search results page
+description = Block placement for solr search results page
+core = 7.x
+package = County Clerk Context
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = facetapi
+features[context][] = solr_search_page
+features[ctools][] = context:context:3
+features[features_api][] = api:2

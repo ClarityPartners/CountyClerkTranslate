@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Department panel feature.
+ */
+
+include_once 'department_panel.features.inc';

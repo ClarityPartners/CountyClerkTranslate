@@ -1,0 +1,26 @@
+--- imce_filefield.module
++++ imce_filefield.module
+@@ -6,6 +6,18 @@
+  */
+ 
+ /**
++ * Implements hook_permission().
++ */
++function imce_filefield_permission() {
++  return array(
++    'imceff select large files' => array(
++      'title' => t('Attach Large Files.'),
++      'description' => t('Ignore the file size setting when attaching files from the server.'),
++    ),
++  );
++}
++
++/**
+  * Implements hook_menu().
+  */
+ function imce_filefield_menu() {
+@@ -125,4 +137,4 @@
+     $done = TRUE;
+     include_once './' . drupal_get_path('module', 'imce_filefield') . '/imce_filefield.inc';
+   }
+-}+}

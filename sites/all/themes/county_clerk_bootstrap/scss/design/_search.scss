@@ -1,0 +1,200 @@
+/*
+    Created on : Aug 31, 2017, 11:08:47 AM
+    Author     : delion
+*/
+.view-search{
+    .primary-search{
+        @media all and(max-width: #{$screen-sm-min - 1}){
+            padding: 0 15px;
+        }
+
+        .view-header{
+            padding:20px 0;
+        }
+        .search-block{
+            .views-exposed-widgets{
+                display: table;
+
+                @media (min-width:$screen-md-min){
+                    padding:20px 0;
+                }
+                .views-exposed-widget{
+                    display:table-cell;
+                    vertical-align: top;
+                    padding:0;
+                    float:none;
+
+                    .input-group-addon{
+                        display:none;
+                    }
+                    .btn-info{
+                        margin:0;
+                        border-radius: 0;
+                        background-color:$btngreen-color;
+                        color:$btngreen-color;
+                        padding: 6px;
+                        width: 35px;
+                        overflow: hidden;
+                        border:0;
+
+                        &:before{
+                            @include fontawesome-icon();
+                            content:"\f002";
+                            color:#FFF;
+                            @include font-size(1.6);
+                            padding-left:4px;
+                        }
+                    }
+                    input{
+                        border-radius: 0;
+                    }
+                }
+            }
+        }
+        //showing X to X of X entiries
+        .views-result-count{
+            border-bottom:1px solid #d2d2d2;
+            padding:5px 0;
+            font-weight:bold;
+        }
+        .view-content{
+            border-bottom:1px solid #d2d2d2;
+            padding-bottom:20px;
+            .search-row{
+                padding:15px 0;
+
+                h3{
+                    margin-top:0;
+                }
+                &.views-row-first{
+                    //padding-top:0;
+                }
+                .cat-type{
+                    color:#626262;
+                }
+                .pub-icon{
+                    @extend .fa-file-pdf-o;
+
+                    &:before{
+                        @include fontawesome-icon();
+                        padding-right: 10px;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+        .text-center{
+            text-align: inherit;
+        }
+    }
+    //sidebar
+    .region-sidebar-second{
+        background-color:#f3f3f3;
+        padding: 10px 20px 25px;
+        margin-top:105px;
+        transition: all 0.5s ease-in-out;
+
+        @media all and(max-width: #{$screen-sm-min - 1}){
+            margin-top: 0;
+        }
+
+        ul{
+            margin:0;
+            padding:0;
+
+            li{
+                padding:3px 0;
+
+                .facetapi-checkbox{
+                    padding-left:5px;
+                }
+            }
+        }
+
+        &:before{
+            content: 'Search Filters';
+            padding: 20px 0px 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: block;
+            color:$light-blue-color;
+            @include font-size(1.8);
+        }
+    }
+}
+
+
+// Search widget on homepage. Controlled by a show/hide checkbox on the node edit page. See preprocess_page() for the code logic.
+.pane-views-exp-primary-search-view-page-1 {
+    display: none;
+}
+
+.show-search .pane-views-exp-primary-search-view-page-1 {
+    display: block;
+    max-width: 500px;
+    margin: 0 auto 60px;
+
+    &:before {
+        content: 'Search the site';
+        line-height: 3rem;
+        font-family: Montserrat,Montserrat-bold;
+        font-weight: 700;
+        font-style: normal;
+        font-size: 1.4rem;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .views-exposed-widgets{
+
+        display: table;
+
+        .views-exposed-widget{
+            display:table-cell;
+            width:100%;
+            vertical-align: top;
+            float: none;
+            padding:0;
+
+            .input-group{
+                //@extend .row;
+                display: block;
+
+                .input-group-addon{display:none;}
+            }
+        }
+        .input-group-addon{
+            display:none;
+        }
+        .form-control,
+        .btn-primary{
+            height:48px;
+            border-radius:0;
+        }
+        .btn-info{
+            background-color:$btngreen-color;
+            border:none;
+            padding:12px 20px;
+            @include font-size(.2);
+            color:$btngreen-color;
+            width:55px;
+            margin-top:0;
+            border-radius: 0;
+            vertical-align: top;
+
+            &:hover{
+                background-color:#47542e;
+            }
+            .icon{
+                display:none;
+            }
+            &:before{
+                @include fontawesome-icon();
+                content:"\f002";
+                color:#FFF;
+                @include font-size(1.8);
+            }
+        }
+    }
+}

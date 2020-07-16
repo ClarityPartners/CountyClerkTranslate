@@ -1,0 +1,16 @@
+name = Service sidebar
+description = adds menu service pages
+core = 7.x
+package = County Clerk Context
+version = 7.x-1.2
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = features
+dependencies[] = filefield_paths
+dependencies[] = services_content_type
+dependencies[] = strongarm
+dependencies[] = views
+features[context][] = service_sidebar
+features[ctools][] = context:context:3
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:2

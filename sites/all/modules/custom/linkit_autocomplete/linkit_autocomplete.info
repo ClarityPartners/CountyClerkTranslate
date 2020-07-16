@@ -1,0 +1,6 @@
+name = Linkit Autocomplete
+description = Custom module that sorts Linkit autocomplete results by newest first.
+core = 7.x
+package = Clarity
+version = 7.x-1.0
+dependencies[] = linkit

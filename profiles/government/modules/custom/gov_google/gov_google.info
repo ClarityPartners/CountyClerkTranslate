@@ -1,0 +1,4 @@
+name =  Government Google Custom Search
+description = Search the site with a Google custom search.
+core = 7.x
+package = Government

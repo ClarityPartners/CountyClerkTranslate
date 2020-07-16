@@ -1,0 +1,27 @@
+--- imce_filefield.js
++++ imce_filefield.js
+@@ -8,6 +8,10 @@
+ Drupal.behaviors.imce_filefield = {attach: function(context, settings) {
+   var set = settings.imce_filefield;
+   if (!set || !set.fields) return;
++  var dir = '';
++  if (set.dir) {
++    dir = '&dir=' + set.dir;
++  }
+   $.each(set.fields, function(fieldID, conf) {
+     // Check imce submit button. Not checking file input because it's ID changes on error.
+     var $button = $('#' + fieldID + '-imce-filefield-submit', context);
+@@ -28,7 +32,7 @@
+     // IMCE opener link.
+     var $opener = $(document.createElement('a')).addClass('imce-filefield-opener').attr({href: '#'});
+     $opener.text(imce_filefield.openerText()).click(function() {
+-      window.open(set.url + '/' + conf.path + (set.url.indexOf('?') < 0 ? '?' : '&') + 'app=imce_filefield|imceload@imce_filefield.imceload&fieldID=' + fieldID, '', 'width=760,height=560,resizable=1');
++      window.open(set.url + '/' + conf.path + (set.url.indexOf('?') < 0 ? '?' : '&') + 'app=imce_filefield|imceload@imce_filefield.imceload&fieldID=' + fieldID + dir, '', 'width=760,height=560,resizable=1');
+       return false;
+     });
+     // Add elements to document.
+@@ -161,4 +165,4 @@
+   return Drupal.t('Open File Browser');
+ };
+ 
+-})(jQuery);+})(jQuery);

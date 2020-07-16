@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Search API Solr Search feature.
+ */
+
+include_once 'search_api_solr_search.features.inc';

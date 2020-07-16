@@ -1,0 +1,297 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Feb 28, 2017, 3:41:22 PM
+    Author     : delion
+*/
+
+.agency-hero{
+    height:360px;
+    background-repeat:no-repeat;
+    background-size: cover;
+
+    @media all and (max-width: 991px){
+        height: auto !important;
+        padding-bottom: 30px;
+    }
+
+    .content{
+
+        @media (min-width:$screen-md-min){
+            transform: perspective(1px) translateY(25%);
+        }
+    }
+    .hero-content{
+        @include make-md-column(6);
+        @include make-lg-column(6);
+        color:#FFF;
+
+
+        .hero-title{
+            @include montserratBold;
+            @include font-size(3.5);
+            text-transform: uppercase;
+            text-shadow: 0px 0px 3px rgba(0, 0, 0, 1);
+        }
+        .hero-description{
+            margin: 2em 0;
+            @include font-size(2.0);
+            line-height: 1.3em;
+            font-style: italic;
+        }
+        .form-control{
+            border-radius: 0;
+            height:46px;
+        }
+        .option-copy{
+            padding:10px 0;
+
+            /*.media_embed,.media-youtube-video{ //client requested to be able to resize iframe
+                padding-bottom:56%;
+                padding-top:0;
+                max-width:100%;
+                position:relative;
+
+                iframe{
+                    position: absolute;
+                    top:0;
+                    left:0;
+                    height:100%;
+                    width:100%;
+                }
+            }*/
+        }
+    }
+    &.optional{
+        padding:20px 0;
+        height:auto;
+
+        .content{
+            transform: inherit;
+        }
+    }
+}
+//jump title for repositioned jump menu
+
+.optional-jump{
+    @include container-fixed();
+    width:100%;
+    max-width:100%;
+    text-align: center;
+    border-top:1px solid #d1d1d1;
+    padding-bottom:40px;
+    margin-top:40px;
+
+    .view-header{
+        margin-top: -2%;
+        color: #665;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+        text-align: center;
+        border: none;
+        background-color: #fff;
+        padding: 0 15px;
+        display: inline-block;
+        position: relative;
+        vertical-align: top;
+
+        h2{
+            color: #666;
+            margin:0;
+            @include font-size(3);
+        }
+    }
+    .view-content{
+        padding:20px 0;
+
+        select, button{
+            border-radius: 0;
+            @include make-sm-column(12);
+            @include make-md-column(4);
+            @include make-md-column-offset(.5);
+            @include make-lg-column(4);
+            @include make-lg-column-offset(.5);
+            display:inline-block;
+            height:46px;
+            float:none !important;
+
+            &:first-child{
+                margin-left:0;
+            }
+            @media (max-width:$screen-md-min){
+                margin-bottom:20px;
+                width:100%;
+            }
+        }
+        button{
+            background-color:#337ab7;
+            color:#FFF;
+            text-transform:uppercase;
+            font-weight:700;
+
+            &:hover{
+                background-color:#286090;
+            }
+        }
+    }
+    @media (min-width:$screen-lg){
+        max-width:$container-lg;
+    }
+}
+.agency-title{
+    @include container-fixed();
+    width:$container-lg;
+    border:none;
+    padding-left:0;
+}
+.agency-body{
+    padding:20px;
+}
+//service
+.service-content{
+    @include container-fixed();
+    @include lora;
+    padding:10px 0 25px;
+    font-style: italic;
+    font-size: 16px;
+    color: #666;
+
+    @media (min-width:$screen-lg-min){
+        width:$container-lg;
+    }
+    .view-content{text-align: center;}
+
+    .ag-services{
+        @include make-sm-column(4);
+        @include make-md-column(2.5);
+        @include make-lg-column(2.3);
+
+        @media (max-width:$screen-xs-max){
+            line-height:15px;
+            padding-bottom:5px;
+
+            .views-field-title{
+                background-color:#39629a;
+                padding: 8px 10px;
+                text-transform:uppercase;
+                vertical-align:middle;
+                color:#FFF;
+                text-align: left;
+
+                a{
+                    color:#FFF;
+
+                }
+                span:before{
+                    @include font-size(3.0);
+                    margin-right:10px;
+                    vertical-align:middle;
+                }
+                /*&:before{
+                    @include fontawesome-icon();
+                    @include font-size(3.0);
+                    display:inline-block;
+                    content:"\f00c";
+                    vertical-align:middle;
+                    margin-right:10px;
+                }*/
+                &:after{
+                    @include fontawesome-icon();
+                    @include font-size(2.0);
+                    display:inline-block;
+                    content:"\f054";
+                    vertical-align:middle;
+                    float:right;
+                    line-height: 0px;
+                    margin-top: -15px;
+                }
+            }
+            .views-field-field-icon-type{
+                display:none;
+            }
+            .views-field-field-summary{
+                background:#f3f3f3;
+                padding:15px;
+                display:none;
+            }
+
+            &.active{
+                .views-field-title{
+                    &:after{
+                        content:'\f077';
+                    }
+                }
+            }
+        }
+        @media (min-width:$screen-sm-min){
+            text-align: center;
+            cursor:pointer;
+            word-break:break-word;
+            @include services();
+
+            a, span{
+                color:#39629a;
+                text-transform: uppercase;
+                @include montserratBold;
+                @include font-size(1.7);
+                display:block;
+                margin: 1em 0;
+            }
+            .icon-type{
+                a:hover{
+                    text-decoration: none;
+                }
+
+                .icon{
+                    @include fontawesome-icon();
+                    @include font-size(4.0);
+                    color:#39629a;
+                    display:block;
+                    height:85px;
+                    width:85px;
+                    text-align: center;
+                    margin:0 auto;
+                    border:4px solid #d6d6d6;
+                    border-radius: 50%;
+                    line-height:77px;
+
+                }
+            }
+            &:hover{
+                .dept-title a{
+                    text-decoration: underline;
+                }
+                &:before{
+                    background-color:#eee;
+                }
+            }
+        }
+        &.active{
+            height:inherit !important;
+
+           .views-field-title{
+               &:after{
+                   content:'\f077';
+               }
+           }
+           .views-field{
+               &:last-child{
+                   display:block;
+               }
+           }
+       }
+    }
+}
+
+.field-name-field-service-description,
+.field-name-field-agency-description{
+    padding:20px 0;
+}
+
+.node-type-agency .body-class-landing .agency-hero {
+    @include lora;
+}

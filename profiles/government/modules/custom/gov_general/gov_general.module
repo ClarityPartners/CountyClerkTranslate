@@ -1,0 +1,342 @@
+<?php
+/**
+ * @file
+ * Function overrides for the Government profile general settings.
+ */
+
+/**
+ * Implements hook_block_info()
+ *
+ * Ensures that this modules workbench create alter hook runs after all the others
+ *
+ */
+function gov_general_block_info() {
+  $blocks['filtering_options'] = array(
+    'info' => t('Filtering Options'),
+  );
+
+  return $blocks;
+}
+
+function gov_general_block_view($delta = '') {
+  // This example is adapted from node.module.
+  $block = array();
+
+  switch ($delta) {
+    case 'filtering_options':
+      $block['subject'] = t('Filtering Options');
+      $block['content'] = array(
+        '#type' => 'markup',
+        '#markup' => '',
+      );
+      break;
+
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Ensures that this modules workbench create alter hook runs after all the others
+ *
+ */
+function gov_general_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'workbench_create_alter') {
+    $group = $implementations['gov_general'];
+    unset($implementations['gov_general']);
+    $implementations['gov_general'] = $group;
+  }
+}
+
+/**
+ * Implements hook_workbench_create_alter().
+ *
+ * Overrides the description text of the workbench media upload
+ * added by workbench_media
+ *
+ */
+function gov_general_workbench_create_alter(&$output) {
+  $items = array(
+    array(
+      'title' => t('Upload Media'),
+      'href' => 'admin/workbench/media/add',
+      'localized_options' => array(),
+      'description' => t('Add photos, images, documents, and other media to the site for use on any pages. You may also upload media when creating content.'),
+    )
+  );
+
+  $output['field_workbench_create_media']['#markup'] = theme('node_add_list', array('content' => $items));
+}
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ *
+ * Overrides the label for the Generic Media browser widget to be "Attach"
+ * instead of "Attach Media"
+ *
+ */
+function gov_general_field_widget_media_generic_form_alter(&$element, &$form_state, $context) {
+  $element['#file_upload_title'] = 'Attach';
+}
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ *
+ * Removes 'None' option from non-required checkbox and radio options widget
+ *
+ */
+function gov_general_field_widget_options_buttons_form_alter(&$element, &$form_state, $context) {
+  if ($element['#required'] == FALSE) {
+    unset($element['#options']['_none']);
+  }
+}
+
+/**
+ * Implements hook_menu_alter
+ * Overrides the media browser callback so we can replace it with
+ * our own copy of the callback, with different tab order
+ */
+function gov_general_menu_alter(&$items) {
+  $items['media/browser']['page callback'] = 'gov_general_media_browser';
+}
+
+/**
+ * Custom Media Browser Page Callback
+ *
+ * Copied from media.browser.inc, with tab order changed
+ */
+function gov_general_media_browser($selected = NULL) {
+  $output = array();
+  $output['#attached']['library'][] = array('media', 'media_browser_page');
+
+  $params = media_get_browser_params();
+
+  // If one or more files have been selected, the browser interaction is now
+  // complete. Return empty page content to the dialog which now needs to close,
+  // but populate Drupal.settings with information about the selected files.
+  if (isset($params['fid'])) {
+    $fids = is_array($params['fid']) ? $params['fid'] : array($params['fid']);
+    if (!is_numeric($fids[0])) {
+      throw new Exception('Error selecting media, fid param is not an fid or an array of fids');
+    }
+    $files = file_load_multiple($fids);
+    foreach ($files as $file) {
+      $view_mode = isset($params['view_mode']) ? $params['view_mode'] : 'preview';
+      media_browser_build_media_item($file, $view_mode);
+    }
+    $setting = array('media' => array('selectedMedia' => array_values($files)));
+    drupal_add_js($setting, 'setting');
+    return $output;
+  }
+
+  $plugins = media_get_browser_plugin_info();
+
+  // Allow parameters to provide a list of enabled or disabled media browser
+  // plugins.
+  // if (!empty($params['enabledPlugins'])) {
+  //   $plugins = array_intersect_key($plugins, array_fill_keys($params['enabledPlugins'], 1));
+  // }
+  // elseif (!empty($params['disabledPlugins'])) {
+  //   $plugins = array_diff_key($plugins, array_fill_keys($params['disabledPlugins'], 1));
+  // }
+
+  // Render plugins.
+  $plugin_output = array();
+  foreach ($plugins as $key => $plugin_info) {
+    // Support the old CTools style handler definition.
+    if (!isset($plugin_info['class']) && !empty($plugin_info['handler'])) {
+      if (is_string($plugin_info['handler'])) {
+        $plugin_info['class'] = $plugin_info['handler'];
+      }
+      elseif (isset($plugin_info['handler']['class'])) {
+        $plugin_info['class'] = $plugin_info['handler']['class'];
+      }
+    }
+
+    if (empty($plugin_info['class']) || !class_exists($plugin_info['class'])) {
+      continue;
+    }
+
+    $plugin = new $plugin_info['class']($plugin_info, $params);
+    if ($plugin->access()) {
+      $plugin_output[$key] = $plugin->view();
+      if (!empty($plugin_output[$key]) && is_array($plugin_output[$key])) {
+        $plugin_output[$key] += array(
+          '#title' => $plugin_info['title'],
+          '#weight' => isset($plugin_info['weight']) ? $plugin_info['weight'] : 0,
+        );
+      }
+      else {
+        unset($plugin_output[$key]);
+        continue;
+      }
+    }
+    else {
+      continue;
+    }
+
+    // We need to ensure that a submit button is available on each tab. If the
+    // plugin is not returning a form element we need to add a submit button.
+    // This is a fairly broad assumption.
+    if (empty($plugin_output[$key]['#form']) && !empty($plugin_output[$key]['#markup'])) {
+      $fake_buttons = '<div class="form-actions form-wrapper">';
+      $fake_buttons .= l(t('Submit'), '', array(
+        'attributes' => array(
+          'class' => array('button', 'button-yes', 'fake-submit', $key),
+        ),
+      ));
+      $fake_buttons .= '</div>';
+      $plugin_output[$key]['#markup'] .= $fake_buttons;
+    }
+  }
+
+  // Allow modules to change the tab names or whatever else they want to change
+  // before we render.  Perhaps this should be an alter on the theming function
+  // that we should write to be making the tabs.
+  drupal_alter('media_browser_plugins', $plugin_output);
+
+  $tabs = array();
+  $settings = array('media' => array('browser' => array()));
+
+  //Change order of tabs by weight
+  if (isset($plugin_output['media_default--media_browser_1'])) {
+    $plugin_output['media_default--media_browser_1']['#weight'] = -200;
+  }
+  if (isset($plugin_output['media_default--media_browser_my_files'])) {
+    $plugin_output['media_default--media_browser_my_files']['#weight'] = -150;
+  }
+  if (isset($plugin_output['media_internet'])) {
+    $plugin_output['media_internet']['#weight'] = -100;
+  }
+  if (isset($plugin_output['upload'])) {
+    $plugin_output['upload']['#weight'] = -50;
+  }
+
+  foreach (element_children($plugin_output, TRUE) as $key) {
+    // Add any JavaScript settings from the browser tab.
+    if (!empty($plugin_output[$key]['#settings'])) {
+      $settings['media']['browser'][$key] = $plugin_output[$key]['#settings'];
+    }
+
+    // If this is a "ajax" style tab, add the href, otherwise an id. jQuery UI
+    // will use an href value to load content from that url
+    $tabid = 'media-tab-' . check_plain($key);
+    if (!empty($plugin_output[$key]['#callback'])) {
+      $href = $plugin_output[$key]['#callback'];
+    }
+    else {
+      $attributes = array(
+        'class' => array('media-browser-tab'),
+        'id' => $tabid,
+        'data-tabid' => $key,
+      );
+      // Create a div for each tab's content.
+      $plugin_output[$key] += array(
+        '#prefix' => '<div ' . drupal_attributes($attributes) . ">\n",
+        '#suffix' => "</div>\n",
+      );
+    }
+
+    $attributes = array(
+      'href' => '#' . $tabid,
+      'data-tabid' => $key,
+      'title' => $plugin_output[$key]['#title'],
+    );
+    $tabs[]['element'] = array(
+      '#markup' => '<li><a' . drupal_attributes($attributes) . '>' . check_plain($plugin_output[$key]['#title']) . "</a></li>\n",
+    );
+  }
+
+  drupal_add_js($settings, 'setting');
+
+  $output['tabset']['tabs'] = array(
+    '#theme' => 'menu_local_tasks',
+    '#attributes' => array('class' => array('tabs', 'primary')),
+    '#primary' => $tabs,
+  );
+
+  $output['tabset']['panes'] = $plugin_output;
+
+  return $output;
+}
+
+/**
+ * Implements hook_node_presave().
+ *
+ * This function is used to map the fields for RSS imports for Event Content Type
+ *
+ */
+function gov_general_node_presave($node) {
+  if ($node->type == 'event' && $node->is_new && strpos($node->title, '- ')) {
+    $full_title = $node->title;
+    list($title, $full_start_date, $time) = explode("- ", $full_title);
+    if ($full_start_date && $time) {
+      $format_date = date('Y-m-d H:i:s ', strtotime($full_start_date . $time));
+      $node->title = $title;
+      $node->field_date['und'][0]['value'] = $format_date;
+      $node->field_date['und'][0]['value2'] = $format_date;
+    }
+  }
+}
+
+function gov_general_form_search_block_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'search_block_form') {
+    $form['search_block_form']['#attributes']['placeholder'] = 'Search';
+  }
+}
+
+/**
+ * Implements hook_image_default_styles().
+ */
+function gov_general_image_default_styles() {
+  $styles = array();
+
+  // Exported image style: 140x175.
+  $styles['140x175'] = array(
+    'label' => '140x175',
+    'effects' => array(
+      3 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 140,
+          'height' => 175,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
+  // Exported image style: 300x375.
+  $styles['300x375'] = array(
+    'label' => '300x375',
+    'effects' => array(
+      2 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 300,
+          'height' => 375,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
+  // Exported image style: frontslider.
+  $styles['frontslider'] = array(
+    'label' => 'frontSlider',
+    'effects' => array(
+      1 => array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 350,
+          'height' => 250,
+        ),
+        'weight' => 1,
+      ),
+    ),
+  );
+
+  return $styles;
+}

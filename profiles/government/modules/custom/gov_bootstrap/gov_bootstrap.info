@@ -1,0 +1,5 @@
+name = Government Bootstrap Helpers
+description = This module handles Drupal compatibility with Bootstrap 3.x
+package = Government
+core = 7.x
+version = 7.x-1.0

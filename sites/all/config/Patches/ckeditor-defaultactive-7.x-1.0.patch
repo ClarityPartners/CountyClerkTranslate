@@ -1,0 +1,15 @@
+diff --git a/sites/all/modules/contrib/ckeditor_accordion/js/ckeditor-accordion.js b/sites/all/modules/contrib/ckeditor_accordion/js/ckeditor-accordion.js
+index d4b118ec..21129b66 100755
+--- a/sites/all/modules/contrib/ckeditor_accordion/js/ckeditor-accordion.js
++++ b/sites/all/modules/contrib/ckeditor_accordion/js/ckeditor-accordion.js
+@@ -19,8 +19,8 @@
+           }
+ 
+           // The first one is the correct one.
+-          $accordion.children('dt:first').addClass('active');
+-          $accordion.children('dd:first').addClass('active');
++          //$accordion.children('dt:first').addClass('active');
++          //$accordion.children('dd:first').addClass('active');
+ 
+           // Turn the accordion tabs to links so that the content is accessible & can be traversed using keyboard.
+           $accordion.children('dt').each(function () {

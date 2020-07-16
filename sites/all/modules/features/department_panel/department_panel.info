@@ -1,0 +1,10 @@
+name = Department panel
+description = department homepage panel
+core = 7.x
+package = County Clerk Panels
+version = 7.x-1.0
+dependencies[] = ctools
+dependencies[] = panels_mini
+features[ctools][] = panels_mini:panels_default:1
+features[features_api][] = api:2
+features[panels_mini][] = homepage_departments

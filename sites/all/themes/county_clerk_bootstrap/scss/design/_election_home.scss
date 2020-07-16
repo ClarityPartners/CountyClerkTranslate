@@ -1,0 +1,59 @@
+#electionsModal{
+  a{
+    color:#FFF;
+    //display:block;
+
+    &:hover{
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+  .modal-dialog{
+    @media (min-width:$screen-lg-min){
+      min-width:660px;
+
+      .modal-body{
+        margin-left:10px;
+      }
+    }
+  }
+}
+.edit-modal{
+  float:left;
+  color:#333 !important;
+}
+.election-blocks{
+  //@include make-sm-column(12);
+  @include make-md-column(5);
+  //@include make-lg-column(12);
+  padding:20px;
+  margin:20px 22px;
+  border:2px solid rgb(190, 190, 190);
+  text-align: center;
+  min-height:190px;
+  display:flex;
+  justify-content: center;
+  flex-direction: column;
+
+  @media (min-width:$screen-md-min) and (max-width:$screen-lg-min){
+    //@include make-md-column(5.4);
+  }
+
+  h1,h2,h3, h4{
+    text-align:center;
+    color:#FFF;
+  }
+
+  &.green{
+    background-color:#64724e;
+  }
+  &.blue{
+    background-color:#182b52;
+  }
+  &.red{
+    background-color:#7a1618;
+  }
+  &.grey{
+    background-color:rgb(68, 68, 68);
+  }
+}

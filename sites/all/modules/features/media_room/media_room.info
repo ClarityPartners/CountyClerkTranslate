@@ -1,0 +1,16 @@
+name = Media Room
+description = media room view
+core = 7.x
+package = County Clerk Views
+version = 7.x-2.3
+dependencies[] = better_exposed_filters
+dependencies[] = strongarm
+dependencies[] = views
+dependencies[] = views_conditional
+features[ctools][] = strongarm:strongarm:1
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[variable][] = uuid_features_entity_file_video
+features[variable][] = uuid_features_file_file_video
+features[views_view][] = media_room
+features_exclude[dependencies][ctools] = ctools

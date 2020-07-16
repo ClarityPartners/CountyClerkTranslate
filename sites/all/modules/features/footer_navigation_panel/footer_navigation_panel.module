@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the footer navigation panel feature.
+ */
+
+include_once 'footer_navigation_panel.features.inc';

@@ -1,0 +1,11 @@
+name = All News View
+description = For the news landing page
+core = 7.x
+package = County Clerk Views
+version = 7.x-1.4
+dependencies[] = ctools
+dependencies[] = fe_block
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = news_categories_menu

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the All Related Events View feature.
+ */
+
+include_once 'all_related_events_view.features.inc';

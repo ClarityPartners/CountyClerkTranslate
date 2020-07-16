@@ -1,0 +1,177 @@
+<?php
+
+//BEGIN: helper funcs
+function block_helper_info($blockTitle)
+{
+	return array(
+		'info' => t($blockTitle),
+		'cache' => DRUPAL_NO_CACHE,
+	);
+}
+
+function block_helper_conf($field_form)
+{
+	$form = array();
+	if (!empty($field_form)) {
+		$form[$field_form] = array(
+			'#type' => 'text_format',
+			'#title' => t('Content copy above form'),
+			'#default_value' => variable_get($field_form, ''),
+		);
+	}
+	return $form;
+}
+
+//END: helper funcs
+
+function field_form_get($delta = '')
+{
+	switch ($delta) {
+		case 'block' :
+			return 'text_content';
+			break;
+		case 'block2' :
+			return 'text_referenda';
+			break;
+		case 'block3' :
+			return 'text_dummy';
+			break;
+		case 'block4' :
+			return 'text_dummy_gv';
+			break;
+		case 'block5' :
+			return 'text_total_ev';
+			break;
+		case 'block6' :
+			return 'text_total_gv';
+			break;
+		case 'block7' :
+			return 'text_polling_places';
+			break;
+		case 'block8' :
+			return 'text_property_tax';
+			break;
+	}
+
+	return '';
+}
+
+function block_template_id_get($delta = '')
+{
+	switch ($delta) {
+		case 'block' :
+			return 'all_candidates';
+			break;
+		case 'block2' :
+			return 'all_referenda';
+			break;
+		case 'block3' :
+			return 'dumtemplate';
+			break;
+		case 'block4' :
+			return 'dgvtemplate';
+			break;
+		case 'block5' :
+			return 'early_voting_total';
+			break;
+		case 'block6' :
+			return 'grace_period_total';
+			break;
+		case 'block7' :
+			return 'polling_places';
+			break;
+		case 'block8' :
+			return 'property_taxes';
+			break;
+	}
+	return '';
+}
+
+function view_candidates_block_info()
+{
+	$blocks = array();
+
+	$blocks['block'] = block_helper_info('View All Candidates');
+	$blocks['block2'] = block_helper_info('View All Referendum');
+	$blocks['block3'] = block_helper_info('Early Voting Location Schedule');
+	$blocks['block4'] = block_helper_info('Grace Voting Location Schedule');
+	$blocks['block5'] = block_helper_info('Early Voting Totals');
+	$blocks['block6'] = block_helper_info('Grace Period Voting Totals');
+	$blocks['block7'] = block_helper_info('Polling Places');
+	$blocks['block8'] = block_helper_info('Property Taxes');
+	return $blocks;
+}
+
+function view_candidates_block_view($delta = '')
+{
+	$block = array();
+	$template_id = block_template_id_get($delta);
+
+	if (!empty($template_id)) {
+		$block['content'] = theme($template_id);
+	}
+	return $block;
+}
+
+function view_candidates_block_configure($delta = '')
+{
+	return block_helper_conf(field_form_get($delta)); // Text field form element
+}
+
+function view_candidates_block_save($delta = '', $edit = array())
+{
+	$field_form = field_form_get($delta);
+
+	if (!empty($field_form)) {
+		variable_set($field_form, $edit[$field_form]['value']); // Save WYSIWYG text
+	}
+}
+
+//implementation of hook_theme
+function view_candidates_theme()
+{
+	$view_candidates_tpl_path = drupal_get_path('module', 'view_candidates') . '/templates';
+
+	return array(
+		'all_candidates' => array(
+			'template' => 'candidates',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'all_referenda' => array(
+			'template' => 'referenda',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'dumtemplate' => array(
+			'template' => 'dummy',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'dgvtemplate' => array(
+			'template' => 'dummy_gv',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'early_voting_total' => array(
+			'template' => 'total_ev',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'grace_period_total' => array(
+			'template' => 'total_gv',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'polling_places' => array(
+			'template' => 'polling_places',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+		'property_taxes' => array(
+			'template' => 'property_taxes',
+			'path' => $view_candidates_tpl_path,
+			'variables' => array(),
+		),
+	);
+}

@@ -1,0 +1,4 @@
+name = Clarity Switch
+description = This module makes the menu block module compatible with bootstrap 3.x
+package = Clarity
+core = 7.x

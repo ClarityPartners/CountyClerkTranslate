@@ -1,0 +1,15 @@
+name = Govt. Body Taxonomy
+description = govt. body taxonomy terms
+core = 7.x
+package = County Clerk Taxonomies
+version = 7.x-1.0
+dependencies[] = government_body_content_type
+dependencies[] = taxonomy
+dependencies[] = uuid
+dependencies[] = uuid_features
+features[features_api][] = api:2
+features[uuid_term][] = 05ae4357-0e80-4529-80ee-42c88faf51b9
+features[uuid_term][] = 1f66d76b-267c-4ac8-9220-df784cf29aaa
+features[uuid_term][] = 6a8344fc-7ec3-4a64-a89c-c38951543ded
+features[uuid_term][] = 75637e86-1e62-46fb-ae74-3b66ea9008f2
+features[uuid_term][] = ecde96af-ccbb-431b-90d7-8e8e0c295650

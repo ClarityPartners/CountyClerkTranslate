@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Homepage Department Queue feature.
+ */
+
+include_once 'homepage_department_queue.features.inc';

@@ -1,0 +1,17 @@
+name = Homepage Blocks
+description = blocks placement for the homepage are in this context
+core = 7.x
+package = County Clerk Context
+version = 7.x-1.2
+dependencies[] = views
+features[context][] = homepage_blocks
+features[ctools][] = context:context:3
+features[fe_block_settings][] = panels_mini-homepage_departments
+features[fe_block_settings][] = views-homepage_jump-block
+features[fe_block_settings][] = views-news_homepage-block
+features[features_api][] = api:2
+features_exclude[dependencies][bean] = bean
+features_exclude[dependencies][context] = context
+features_exclude[dependencies][ctools] = ctools
+features_exclude[dependencies][panels_mini] = panels_mini
+features_exclude[dependencies][fe_block] = fe_block

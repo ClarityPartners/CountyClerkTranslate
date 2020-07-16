@@ -1,0 +1,15 @@
+name = Contact Us Context
+description = Context and layout for the contact us page.
+core = 7.x
+package = Government Contexts
+version = 7.x-1.0
+dependencies[] = block
+dependencies[] = context
+dependencies[] = ctools
+dependencies[] = fe_block
+features[context][] = contact_us
+features[ctools][] = context:context:3
+features[fe_block_boxes][] = contact_us_contact_info
+features[fe_block_settings][] = block-contact_us_contact_info
+features[features_api][] = api:2
+no autodetect = 1

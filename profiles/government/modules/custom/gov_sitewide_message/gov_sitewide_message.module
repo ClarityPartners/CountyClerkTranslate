@@ -1,0 +1,324 @@
+<?php
+/**
+ * @file
+ * Sitewide Message integration.
+ */
+
+/**
+ * Push message.
+ *
+ * @param array $messages
+ *   An associative array containing:
+ *   - element: Arguments for gov_sitewide_message JS.
+ */
+function gov_sitewide_message_say($messages = array()) {
+  drupal_add_js(array('Sitewide Message' => $messages), 'setting');
+}
+
+/**
+ * Implements hook_permission()
+ */
+function gov_sitewide_message_permission() {
+  return array(
+    'administer sitewide message' => array(
+      'title' => t('Administer sitewide message module'),
+      'description' => t('Perform administration tasks for sitewide message.'),
+    ),
+  );
+}
+function gov_sitewide_message_menu() {
+  $items = array();
+
+  $items['admin/config/system/sitewide-message'] = array(
+    'title' => t('Sitewide Message'),
+    'description' => t('General settings for sitewide message'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('gov_sitewide_message_settings'),
+    'access arguments' => array('administer sitewide message'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_node_info().
+ *
+ * Defines the Sitewide Message node/content type.
+ * @return array
+ *   An array, containing the title, module name and the description.
+ */
+function gov_sitewide_message_node_info() {
+  return array(
+    'gov_sitewide_message' => array(
+      'name' => t('Sitewide Message'),
+      'base' => 'gov_sitewide_message',
+      'description' => t('A message that will be displayed in a specific region on every page.'),
+      'has_title' => '1',
+      'title_label' => t('Message Title'),
+      'node-submitted' => 0,
+    ),
+  );
+}
+
+/**
+ * Implements hook_form().
+ *
+ * @param object $node
+ *   The node being added or edited.
+ *
+ * @param array $form_state
+ *   The hook can set this variable to an associative array of attributes to add
+ *   to the enclosing <form> tag.
+ *
+ * @return array
+ *   The form elements in the $form array.
+ */
+function gov_sitewide_message_form($node, $form_state) {
+  $type = node_type_get_type($node);
+  $form = node_content_form($node, $form_state);
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => check_plain($type->title_label),
+    '#default_value' => !empty($node->title) ? $node->title : '',
+    '#required' => TRUE,
+    '#weight' => -5,
+    '#description' => t('Enter a short identifier for this sitewide message.'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+
+function gov_sitewide_message_form_gov_sitewide_message_node_form_alter(&$form, &$form_state, $form_id) {
+  // Modification for the form with the given form ID goes here. For example, if
+  // FORM_ID is "user_register_form" this code would run only on the user
+  // registration form.
+
+  $form['title']['#description'] = t('Enter a short identifier for this sitewide message.');
+}
+
+/**
+ * Sitewide message add js.
+ */
+function gov_sitewide_message_add_js() {
+  $module_path = drupal_get_path('module', 'gov_sitewide_message');
+  drupal_add_css($module_path . '/gov_sitewide_message.css');
+  drupal_add_js($module_path . '/gov_sitewide_message.js');
+  gov_sitewide_message_get_messages();
+}
+
+/**
+ * Getting latest message from content type
+ */
+function gov_sitewide_message_get_messages() {
+  
+  $query = db_select('node', 'n');
+  $query_node = $query->fields('n',array('nid'));
+  $query_node->condition('n.type', 'gov_sitewide_message');
+  $query_node->condition('n.status', NODE_PUBLISHED);
+  $query_node->orderBy('created', 'DESC');
+  $query_node->range(0, 1);
+  $nid = $query_node->execute()->fetchField();
+  
+  if (!empty($nid)) {
+    $node = node_load($nid);
+  }
+  
+  $messages = array();	
+  if (!empty($node)) {
+    $messages['message'] = check_plain($node->field_message_text['und'][0]['value']);
+    $messages['link_text'] = check_plain($node->field_link_text['und'][0]['value']);
+    $messages['link'] = check_plain($node->field_link['und'][0]['value']);
+    $messages['color_bg'] = variable_get('gov_sitewide_message_color_bg', '#45AB35');
+    $messages['color_text'] = variable_get('gov_sitewide_message_color_text', '#ffffff');
+    $messages['color_link'] = variable_get('gov_sitewide_message_color_link', '#F3FA25');
+  }
+  else {
+    $messages['message'] = 'No message added yet';
+    $messages['link_text'] = 'Modify Sessings Here';
+    $messages['link'] = url('admin/config/system/sitewide-message', array('absolute' => true));
+    $messages['color_bg'] = variable_get('gov_sitewide_message_color_bg', '#45AB35');
+    $messages['color_text'] = variable_get('gov_sitewide_message_color_text', '#ffffff');
+    $messages['color_link'] = variable_get('gov_sitewide_message_color_link', '#F3FA25');
+  }
+  $messages['autohide'] = variable_get('gov_sitewide_message_autohide', TRUE);
+  $messages['autohide_seconds'] = variable_get('gov_sitewide_message_autohide_seconds', 5);
+  $messages['link_target'] = (variable_get('gov_sitewide_message_new_window_link', TRUE) == TRUE ? '_blank' : '');
+  gov_sitewide_message_say($messages);
+}
+
+/**
+ * Sitewide message autohide settings
+ */
+function gov_sitewide_message_settings() {
+  $form = array();
+  $form['gov_sitewide_message_autohide'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Autohide sitewide message'),
+    '#default_value' => variable_get('gov_sitewide_message_autohide', TRUE),
+  );
+  $form['gov_sitewide_message_new_window_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Open Link in new window'),
+    '#default_value' => variable_get('gov_sitewide_message_new_window_link', TRUE),
+  );
+  $form['gov_sitewide_message_autohide_seconds'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Number of seconds'),
+    '#default_value' => variable_get('gov_sitewide_message_autohide_seconds', 5),
+  );
+  
+  if (module_exists('color')) {  
+    drupal_add_css('misc/farbtastic/farbtastic.css');
+    drupal_add_js('misc/farbtastic/farbtastic.js');
+
+    $form['gov_sitewide_message_color_bg'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Background color'),
+      '#default_value' => variable_get('gov_sitewide_message_color_bg', '#45AB35'),
+      '#maxlength' => 7,
+      '#size' => 7,
+      '#description' => '<div id="sitewide-message-color-bg-picker"></div>',
+    );
+
+    $form['colorpicker_bg'] = array(
+      '#type' => 'item',
+      '#description' => "<script type='text/javascript'>
+        (function($) { 
+          $(document).ready(function() {
+            $('#sitewide-message-color-bg-picker').farbtastic('#edit-sitewide-message-color-bg');
+          });
+          }) (jQuery);
+      </script>",
+    );
+    
+    $form['gov_sitewide_message_color_text'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Text color'),
+      '#default_value' => variable_get('gov_sitewide_message_color_text', '#ffffff'),
+      '#maxlength' => 7,
+      '#size' => 7,
+      '#description' => '<div id="sitewide-message-color-text-picker"></div>',
+    );
+
+    $form['colorpicker_text'] = array(
+      '#type' => 'item',
+      '#description' => "<script type='text/javascript'>
+        (function($) { 
+          $(document).ready(function() {
+            $('#sitewide-message-color-text-picker').farbtastic('#edit-sitewide-message-color-text');
+          });
+          }) (jQuery);
+      </script>",
+    );
+    
+    $form['gov_sitewide_message_color_link'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Link color'),
+      '#default_value' => variable_get('gov_sitewide_message_color_link', '#F3FA25'),
+      '#maxlength' => 7,
+      '#size' => 7,
+      '#description' => '<div id="sitewide-message-color-link-picker"></div>',
+    );
+
+    $form['colorpicker_link'] = array(
+      '#type' => 'item',
+      '#description' => "<script type='text/javascript'>
+        (function($) { 
+          $(document).ready(function() {
+            $('#sitewide-message-color-link-picker').farbtastic('#edit-sitewide-message-color-link');
+          });
+          }) (jQuery);
+      </script>",
+    );
+    
+    
+  }else{ 
+    $form['gov_sitewide_message_color_msg'] = array(
+      '#type' => 'markup',
+      '#markup' => t('Please install Color module to change the sitewide color settings.'),
+    );
+  }
+  
+  
+  if (module_exists('context')) {
+    $form['gov_sitewide_message_context'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Use Context to choose when the sitewide message is added to the page.'),
+      '#description' => t('The sitewide message code will be included on all pages of your site by default. You can use <a href="!context_url">Context module</a> to fine tune when and where it will be displayed.', array('!context_url' => url('admin/structure/context'))),
+      '#default_value' => variable_get('gov_sitewide_message_context', 0),
+    );
+  }
+  return system_settings_form($form);
+}
+
+
+/**
+ * Implements hook_footer().
+ */
+function gov_sitewide_message_page_alter(&$page) {
+  if (variable_get('gov_sitewide_message_enable', 1)) {
+    if (!variable_get('gov_sitewide_message_context', 0)) {
+      gov_sitewide_message_add_js();
+    }
+    else {
+      if ($plugin = context_get_plugin('reaction', 'gov_sitewide_message_add')) {
+        if ($plugin->execute()) {
+          gov_sitewide_message_add_js();
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_context_registry().
+ */
+function gov_sitewide_message_context_registry() {
+  return array(
+    'reactions' => array(
+      'gov_sitewide_message_add' => array(
+        'title' => t('Sitewide Message '),
+        'plugin' => 'gov_sitewide_message_context_reaction_add',
+        'description' => t('Add sitewide message code to the page'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Notify CTools that we'll be using the plugin API with Context module.
+ */
+function gov_sitewide_message_ctools_plugin_api($module, $api) {
+  if ($module == 'context' && $api == 'plugins') {
+    return array('version' => 3);
+  }
+}
+
+/**
+ * CTools plugin API hook for Context.
+ */
+function gov_sitewide_message_context_plugins() {
+  $plugins = array();
+  $plugins['gov_sitewide_message_context_reaction_add'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'gov_sitewide_message') . '/plugins',
+      'file' => 'gov_sitewide_message_context_reaction_add.inc',
+      'class' => 'gov_sitewide_message_context_reaction_add',
+      'parent' => 'context_reaction',
+    ),
+  );
+
+  return $plugins;
+}
+
+function gov_sitewide_message_help($path, $arg) {
+  switch ($path) {
+    // Main module help for gov_sitewide_message module
+    case 'admin/help#gov_sitewide_message':
+      return '<p>' . t('This module creates a region area for displaying call-to-action messages and a content type for creating those messages with text for links, etc. To create sitewide messages, go to node/add/gov_sitewide_message where you can create the messages. Color changes and settings are available on the on the settings page. Display can be set either as site wide or controlled via the context module.', array('@blocks' => url('admin/config/system/sitewidemessage'))) . '</p>';
+  }
+}

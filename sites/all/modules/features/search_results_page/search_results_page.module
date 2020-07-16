@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Search results page feature.
+ */
+
+include_once 'search_results_page.features.inc';

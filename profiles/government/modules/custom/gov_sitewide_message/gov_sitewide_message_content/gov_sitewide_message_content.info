@@ -1,0 +1,29 @@
+name = Government Sitewide Message Content
+core = 7.x
+package = Government
+description = Adds fields and configuration settings for the Government Sitewide Message module.
+
+dependencies[] = features
+dependencies[] = strongarm
+dependencies[] = gov_sitewide_message
+
+features[ctools][] = strongarm:strongarm:1
+features[features_api][] = api:1
+features[field][] = node-gov_sitewide_message-field_link
+features[field][] = node-gov_sitewide_message-field_link_text
+features[node][] = gov_sitewide_message
+
+features[variable][] = comment_anonymous_gov_sitewide_message
+features[variable][] = comment_default_mode_gov_sitewide_message
+features[variable][] = comment_default_per_page_gov_sitewide_message
+features[variable][] = comment_form_location_gov_sitewide_message
+features[variable][] = comment_preview_gov_sitewide_message
+features[variable][] = comment_subject_field_gov_sitewide_message
+features[variable][] = comment_gov_sitewide_message
+features[variable][] = field_bundle_settings_node__gov_sitewide_message
+features[variable][] = menu_options_gov_sitewide_message
+features[variable][] = menu_parent_gov_sitewide_message
+features[variable][] = node_options_gov_sitewide_message
+features[variable][] = node_preview_gov_sitewide_message
+features[variable][] = node_submitted_gov_sitewide_message
+

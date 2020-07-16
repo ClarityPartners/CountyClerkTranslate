@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Date Format feature.
+ */
+
+include_once 'date_format.features.inc';

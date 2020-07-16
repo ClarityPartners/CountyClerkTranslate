@@ -1,0 +1,232 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Aug 18, 2017, 2:26:47 AM
+    Author     : delion
+*/
+
+
+
+.contact-header{
+        display:flex;
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(51% - 50vw);
+        background-color:$blue-color;
+
+        @media(min-width:$screen-lg-min){
+            padding:50px;
+        }
+
+    & > .view-content{
+        @include container-fixed();
+        max-width:1170px;
+        width:100%;
+
+        @media(min-width:$screen-md-max){
+            padding:0;
+        }
+
+        h2{
+            color:#FFF;
+        }
+        .lang-phone{
+            ul{
+                @extend .row;
+                display:block;
+                padding:0;
+                li{
+                    display:inline-block;
+                    @include make-xs-column(12);
+                    @include make-sm-column(3.8);
+                    @include make-md-column(2.28);
+                    @include make-lg-column(2.3);
+
+
+                    margin:5px;
+                    background-color:#FFF;
+                    padding:20px;
+
+                    &:last-child{
+                        margin-right:0;
+                    }
+                    &:before{
+                        @include fontawesome-icon();
+                        @include font-size(3.0);
+                        content:"\f095";
+                        height: 35px;
+                        width: 25px;
+                        float: left;
+                        margin: 0 8px;
+                    }
+
+                    @media(max-width:$screen-xs-max){
+                        margin:5px 0;
+                    }
+                }
+            }
+        }
+        .contact-primary-wrapper{
+            @include container-fixed();
+            padding:0;
+
+            @media(min-width:$screen-sm-min){
+                padding:5px;
+            }
+
+            .contact-map{
+                @include make-sm-column(7.89);
+                @include make-md-column(8);
+                @include make-lg-column(8);
+                background-color:#fff;
+
+                @media(min-width:$screen-sm-min){
+                    background-image:url('../img/contacts-map.png');
+                    background-position: -150% 50%;
+                    min-height:130px; //may need to change this for responsive
+                    padding-right:0;
+                    margin-right:10px;
+                    background-size:93%;
+                }
+
+                @media(min-width:$screen-md-min){
+                    background-position: -170% 50%;
+                }
+
+                .location{
+                    background-color:#FFF;
+                    min-height:100%;
+                    width:100%;
+                    padding:20px;
+                    margin-bottom:10px;
+                    &:before{
+                        @include fontawesome-icon();
+                        @include font-size(3.0);
+                        content:"\f041";
+
+                        @media(max-width:$screen-sm-max){
+                            float: left;
+                            line-height:19px;
+                            margin:0 8px;
+                            height:20px;
+                        }
+                    }
+                    @media(max-width:$screen-xs-max){
+                        padding:20px 10px;
+                    }
+                    @media(min-width:$screen-xs-max) and (max-width:$screen-sm-min){
+                        padding:46px 20px !important;
+                    }
+                    @media(min-width:$screen-sm-min){
+                        width:50%;
+                        float: right;
+                        padding: 20px 20px 30px;
+                        margin-bottom:0px;
+                    }
+                    @media(min-width:$screen-md-min){
+                        width:35%;
+                    }
+                }
+            }
+            .contact-prime-email{
+                @include make-sm-column(3.8);
+                @include make-md-column(3.86);
+                @include make-lg-column(3.892);
+                background-color:#fff;
+                padding:20px;
+                margin-bottom:5px;
+
+                &:before{
+                    @include fontawesome-icon();
+                    @include font-size(3.0);
+                    content:"\f003";
+                    display:block;
+
+                    @media(max-width:$screen-xs-max){
+                        float: left;
+                        line-height:19px;
+                        margin:0 8px;
+                    }
+
+                }
+
+                @media(min-width:$screen-sm-min){
+                    min-height:130px;
+                    margin-bottom:0px;
+                }
+            }
+        }
+    }
+
+}
+.contact-body{
+    padding-left:0;
+    padding-right:0;
+
+    @media (max-width: $screen-md-min){
+        width:100%;
+    }
+
+    .view-header{
+        padding:10px 0 20px;
+    }
+    .contact-grid{
+        padding:20px 0;
+
+        .views-column{
+            margin:5px;
+            background-color:$grey-color;
+            padding:15px;
+            @include make-sm-column(12);
+            @include make-md-column(2.85);
+            @include make-lg-column(2.89);
+
+
+            @media (max-width: $screen-md){
+                margin-left:0;
+                margin-right:0;
+            }
+
+            .accent{
+                color:#666;
+                @include montserratBold;
+                text-transform: uppercase;
+            }
+            .view-label-info{
+                text-transform: uppercase;
+            }
+            .more-info{
+                ul{
+                    padding-left:20px;
+
+                    li{
+                        //word-break: break-all;
+                    }
+                }
+            }
+            .optional-title{
+                padding-bottom:15px;
+            }
+        }
+        .lang-phone{
+            ul{
+                display:block;
+                padding:0;
+                li{
+                    display:inline-block;
+                    @include make-md-column(2.29);
+                    @include make-lg-column(2.29);
+                    background-color:#FFF;
+                    padding:10px;
+                    padding: 5px 0;
+
+                    @media (min-width: $screen-md){
+                        margin:5px;
+                    }
+                }
+            }
+        }
+    }
+}

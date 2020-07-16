@@ -1,0 +1,202 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Sep 07, 2017, 3:58:07 PM
+    Author     : delion
+*/
+
+.jobs-content{
+    padding:0;
+
+    .jobs-location{
+
+        .job-location-title,
+        .job-location-address{
+            @include font-size(2.0);
+            text-transform: uppercase;
+            line-height:20px;
+            font-weight:700;
+        }
+        .job-location-address{
+            padding-bottom:5px;
+        }
+        span.jobs-time{
+            float:left;
+            clear:both;
+            margin-right:5px;
+            font-weight:700;
+        }
+    }
+    .jobs-desc{
+        padding:15px 0 15px 0;
+    }
+    .jobs-down{
+        .field-label{
+            @include font-size(2.0);
+        }
+        .field-item{
+            display:list-item;
+            margin-left:20px;
+        }
+        img{display:none;}
+    }
+}
+.jobs-display{
+
+    .jobs-form{
+        background-color:#f3f3f3;
+        padding:0 20px 20px;
+
+        @media (min-width:$screen-md-min){
+            margin-top:80px;
+        }
+        @media (max-width:$screen-md-min){
+            margin-top:20px;
+            margin-bottom:20px;
+        }
+
+        //general panel styling
+        h2{
+            font-weight: 700;
+            border-bottom:1px solid #CCC;
+            padding-bottom:10px;
+        }
+        .form-group input,
+        .form-group select{
+            border-radius: 0;
+        }
+        .panel{
+            background:none;
+            border:none;
+            box-shadow: none;
+        }
+        .panel-title{
+            color:#686868;
+            text-transform: uppercase;
+        }
+        .panel-heading{
+            background:none;
+            padding:10px 0;
+            border:none;
+        }
+        .panel-body{
+            padding:0;
+        }
+
+        //specific
+        .app-name{
+            .form-group{
+                @include make-md-column(6);
+                padding:0;
+
+                &:last-child{
+                    padding-left:10px;
+                }
+            }
+        }
+        .app-email{
+            @include make-md-column(6);
+            padding:0;
+        }
+        .app-phone{
+            @include make-md-column(6);
+            padding:0 0 0 10px;
+        }
+        .app-city-state{
+            .app-city{
+                @include make-md-column(6);
+                padding:0;
+            }
+            .app-state{
+                @include make-md-column(3);
+                padding:0 10px;
+            }
+            .app-zip{
+                @include make-md-column(3);
+                padding:0;
+            }
+        }
+        .app-resume{
+            border-bottom:1px solid #ccc;
+            padding-bottom:10px;
+        }
+        .btn-primary{
+            width:100%;
+            border-radius:0;
+            margin:10px 0;
+        }
+    }
+}
+
+//view page
+.job-list{
+    padding-left:0;
+    padding-right:0;
+
+    @media (max-width: $screen-md-min){
+        width:100%;
+    }
+
+    .jobs-grid{
+        padding:20px 0;
+
+        .views-column{
+            margin:5px;
+            background-color:$grey-color;
+            @include make-sm-column(12);
+            @include make-md-column(2.85);
+            @include make-lg-column(2.89);
+            padding:20px;
+
+            @media (max-width: $screen-md){
+                margin-left:0;
+                margin-right:0;
+            }
+
+            .accent{
+                color:#666;
+                @include montserratBold;
+                text-transform: uppercase;
+                margin-top:0;
+            }
+            .view-label{
+                text-transform: capitalize;
+            }
+            .job-location{
+                padding:5px 0 10px;
+            }
+            .view-label-info{
+                text-transform: uppercase;
+            }
+            .job-type{
+                padding:5px 0;
+            }
+            .more-info{
+                ul{
+                    padding-left:20px;
+
+                    li{
+                        word-break: break-all;
+                    }
+                }
+            }
+            .job-detail a{
+                display:inline-block;
+                color:#FFF;
+                font-weight:700;
+                background-color:$light-blue-color;
+                padding: 5px 25px;
+                margin: 10px 0;
+                text-transform: uppercase;
+            }
+        }
+    }
+    .view-content{
+        border-bottom: 1px solid #CCC;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+}

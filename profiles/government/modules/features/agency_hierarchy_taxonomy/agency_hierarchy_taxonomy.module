@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Agency Hierarchy Taxonomy feature.
+ */
+
+include_once 'agency_hierarchy_taxonomy.features.inc';

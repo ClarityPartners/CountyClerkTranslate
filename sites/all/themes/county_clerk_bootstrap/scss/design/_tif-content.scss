@@ -1,0 +1,43 @@
+//TIF content
+
+.tif-viewer {
+  @media all and(min-width: $screen-lg-min){
+    td:first-child {
+      padding-right: 35px;
+    }
+  }
+
+  @media all and (max-width: $screen-lg-min - 1){
+    td {
+      display: block;
+
+      img {
+        max-width: 480px;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.tif-info {
+  @media all and(min-width: $screen-lg-min){
+    td:nth-child(even) {
+      padding: 0 0 0 50px;
+    }
+  }
+
+  @media all and(min-width: 611px){
+    td:nth-child(even) {
+      padding: 0 0 0 30px;
+    }
+  }
+
+  @media all and(max-width: 610px){
+    display: block;
+    width: 100%;
+
+    td {
+      display: block;
+    }
+  }
+}

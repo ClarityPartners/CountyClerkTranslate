@@ -1,0 +1,15 @@
+name = News Type Taxonomy
+description = news type taxonomy terms
+core = 7.x
+package = County Clerk Taxonomies
+version = 7.x-1.1
+dependencies[] = news_content_type
+dependencies[] = taxonomy
+dependencies[] = uuid
+dependencies[] = uuid_features
+features[features_api][] = api:2
+features[uuid_term][] = 6d66614d-5981-4841-b85e-e6fde8dd3ba5
+features[uuid_term][] = 6e4c3e52-4ff6-4acc-935b-496a642e920b
+features[uuid_term][] = 9caa6cd3-6919-4985-9d0c-8d08cab0377d
+features[uuid_term][] = b1371e64-6c1a-4fd2-a89d-b78fb5640a36
+features[uuid_term][] = d06ca1ee-c3bc-4ff8-9b82-097f6c1f57f3

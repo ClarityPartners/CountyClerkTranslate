@@ -1,0 +1,471 @@
+#registration-stats-block-form{
+    & > div{
+        @extend .row;
+
+        .buttons{
+            border-radius: 0;
+            background-color: #65734b;
+            border: none;
+            margin: 10px 0;
+        }
+        .links{
+            border: none;
+            padding: 2px 0;
+            color: $light-blue-color;
+            display: list-item;
+            list-style-type: circle;
+            text-decoration: underline;
+
+           &:hover{
+               background: none;
+           }
+        }
+        label{
+            @include font-size(2.0);
+            color: $light-blue-color;
+            text-transform: uppercase;
+            padding-bottom: 10px;
+        }
+        select{
+            border-radius: 0;
+        }
+        .panel-default{
+            border: none;
+            box-shadow: none;
+        }
+        .votercount,
+        .novotercount{
+            @extend .row;
+            @include font-size(1.8);
+            display: block;
+            background:$grey-color;
+            clear: both;
+            padding: 25px 20px;
+            font-weight: 700;
+            color: #65734b;
+        }
+        #edit-jurisdiction{
+            @include make-md-column(5);
+            @include make-sm-column(5);
+
+            .btn{
+                @extend .buttons;
+            }
+        }
+        .or.separator{
+            @include make-md-column(2);
+            @include make-sm-column(2);
+            @include font-size(2.0);
+            padding: 0;
+            margin-left: 20px;
+            margin-right: 20px;
+            border-top: 1px solid;
+            border-bottom: 1px solid;
+            text-align: center;
+            font-weight: 700;
+
+            @media(min-width:$screen-sm-min){
+                margin-top: 9%;
+                max-width: 30px;
+            }
+            @media(min-width:$screen-sm-min) and (max-width:$screen-sm-max){
+                margin-top: 20%;
+            }
+        }
+        #edit-location{
+            @include make-md-column(5);
+            @include make-sm-column(5);
+
+            .btn{
+                @extend .buttons;
+            }
+        }
+        #edit-town-lists{
+            @include make-md-column(6);
+            @include make-sm-column(6);
+
+            .btn{
+                @extend .links;
+            }
+
+            .panel-body{
+                 & > div{
+                    padding-bottom: 10px;
+                }
+            }
+        }
+        #edit-streets{
+            @include make-md-column(6);
+            @include make-sm-column(6);
+
+            .btn{
+                @extend .links;
+            }
+
+            .panel-body{
+
+                & > div{
+                   padding-bottom: 10px;
+               }
+           }
+        }
+    }
+    .input-group{width:100%;}
+    .input-group-addon{display:none;}
+}
+
+//candidate filing here
+.page-service-candidate-filing{ //not cool but pressed for time
+    h1.page-header {
+        display: none;
+    }
+}
+.candidate-bar{
+    display: block;
+    background-color: $blue-color;
+    padding: 20px;
+    clear: both;
+
+    @media(min-width:$screen-md-min){
+        padding-top: 25px;
+        padding-bottom: 25px;
+    }
+
+    .candidate-info{
+        width: auto;
+        display: inline-block;
+        vertical-align: top;
+
+        label{
+            color: #FFF;
+        }
+        .form-item-status-filter{
+            width: 100%;
+
+            @media(min-width:$screen-lg-min){
+                width: auto;
+                margin-bottom: 0;
+                float: left;
+            }
+
+            label{
+                display: inline-block;
+                font-weight: 700;
+                min-width: 155px;
+                @include font-size(1.8);
+                padding-top: 10px;
+
+                @media(min-width:$screen-sm-min){
+                    max-width: 65px;
+                    padding-top: 0;
+                }
+
+                @media(min-width:$screen-lg-min){
+                    margin-left: 10px;
+                    margin-right: 5px;
+                    text-align: right;
+                    min-width: 145px;
+                }
+            }
+            select{
+                border-radius: 0;
+                min-width: 190px;
+                display: inline-block;
+                width: 100%;
+                margin-bottom: 10px;
+
+                @media(min-width:$screen-sm-min){
+                    width: calc(100% - 160px);
+                }
+
+                @media(min-width:$screen-lg-min){
+                    max-width: 190px;
+                    margin-bottom: 0;
+                }
+
+            }
+            &.candidates{
+                label{
+                    min-width: 135px;
+                }
+            }
+            &.polling{
+                label{
+                    max-width: 60px;
+                }
+            }
+        }
+        .btn-info{
+            border-radius: 0;
+            color: #FFF;
+            background-color: #65734b;
+            border: none;
+
+            &:hover{
+                background-color: #47542e;
+            }
+
+            @media(min-width:$screen-lg-min){
+                margin: 0 10px;
+            }
+        }
+        @media(max-width:$screen-xs-max){
+            padding: 0;
+            margin: 0;
+
+            .form-item-status-filter{
+                display: block;
+                width: auto;
+            }
+            .btn-info{
+                margin-left: 0;
+            }
+        }
+        &.view-all{
+            .form-item-status-filter{
+                width: 100%;
+
+                @media(min-width:$screen-lg-min){
+                    width: auto;
+                }            
+            }
+        }
+    }
+    &.evlocations{
+        margin: 15px 0;
+
+        @media(min-width:$screen-lg-min){
+            padding-left: 0;
+        }
+
+        .form-item-status-filter{
+
+            .evtotals-location,
+            .evtotals-dates{
+                display: table-cell;
+                padding: 0 10px;
+
+                @media(max-width:$screen-md-min){
+                    display: block;
+                }
+            }
+
+            select{
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            @media(min-width:$screen-lg-min){
+                width: 85%;
+            }
+
+            label {
+                margin-bottom: 0;
+
+                @media(min-width:$screen-lg-min){
+                    margin-left: 0;
+                    text-align: left;
+                }
+            }
+        }
+        #edit-status-submit{
+            margin-left: 10px;
+
+            @media(min-width:$screen-lg-min){
+                margin-top: 30px;
+                margin-left: 0;
+            }
+            @media(max-width:$screen-md-min){
+                margin: 0 10px;
+            }
+        }
+    }
+    &.earlyVoting,
+    &.graceVoting{
+        @media(min-width:$screen-md-min){
+            padding: 20px 45px 5px;
+        }
+    }
+    @media(min-width:$screen-lg-min){
+        padding-left: 100px;
+    }
+}
+.cFiling{
+    thead{
+        th{
+            &:after{
+                @include fontawesome-icon();
+                content: '\f104     \f105';
+                display: inline-block;
+                -webkit-transform: rotate(90deg);
+                -moz-transform: rotate(90deg);
+                -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
+                float: right;
+            }
+            min-width: 120px;
+        }
+    }
+}
+.evtotals-pager{
+    .active-cursor {
+		cursor: pointer;
+	}
+
+	.noselect {
+		-webkit-touch-callout: none; /* iOS Safari */
+		-webkit-user-select: none; /* Safari */
+		-khtml-user-select: none; /* Konqueror HTML */
+		-moz-user-select: none; /* Firefox */
+		-ms-user-select: none; /* Internet Explorer/Edge */
+		user-select: none;
+        /* Non-prefixed version, currently
+        supported by Chrome and Opera */
+	}
+}
+.pull-right.evlocations{
+    padding-bottom: 15px;
+}
+table.evlocations{
+    margin-top: 20px;
+
+    thead{
+        background-color: #182b52;
+        color: #FFF;
+    }
+    tbody tr{
+        background-color: #FFF !important;
+    }
+}
+.candidates-container{
+
+    .candidates-header{
+        @extend .row;
+        margin: 0;
+        margin-top: 20px;
+        background-color: #182b52;
+        padding: 10px;
+
+        h4{
+            color: #FFF;
+            margin: 0;
+            float: left;
+        }
+        .text-muted{
+            float: right;
+            color: #FFF;
+            font-weight: 700;
+        }
+    }
+    table{
+        table-layout: fixed;
+        width: 100%;
+        border-color: #182b52;
+        border-width: 2px;
+    }
+    thead > tr > th{
+        border-bottom-width: 1px;
+    }
+    @media(min-width:$screen-sm-max){
+        padding: 0 60px;
+    }
+}
+#block-view-candidates-block2{
+    @media(min-width:$screen-md-max){
+        padding-right: 15px;
+    }
+
+    table{
+        thead{
+            background-color: #182b52;
+            color: #FFF;
+        }
+    }
+}
+//specific to form
+#candidate-filing-page-form{
+    .elections-btn{
+        float: right;
+        padding: 0 0 20px 0;
+        text-decoration: underline;
+        font-weight: 700;
+
+        &:after{
+            clear: both;
+        }
+    }
+    .table-responsive{
+        padding: 20px 0;
+        thead{
+            tr{
+                th{
+                    background: none;
+
+                    &.active{
+                        position: relative;
+                        display: block;
+
+                        img{
+                            position: absolute;
+                            top: 10px;
+                            right: 0;
+                        }
+                    }
+                }
+            }
+        }
+        table{
+            th{
+                border: none;
+            }
+            tr{
+                background: none;
+
+                td{
+                    background: none;
+                }
+            }
+        }
+    }
+}
+.block-view-candidates{
+    .container{
+        width: 100%;
+    }
+}
+.early-voting.table{
+    thead{
+        background-color:#182b52;
+        color:#FFF;
+
+        th {
+            position: relative;
+            padding-right: 22px;
+
+            &:before, 
+            &:after {
+                position: absolute;
+                right: 8px;
+                font-size: 1.1rem;
+            }
+
+            &:before {
+                content: '\25B2';
+                top: .6rem;
+            }
+
+            &:after {
+                content: '\25BC';
+                top: 1.4rem;
+            }
+        }
+    }
+    tbody{
+        tr{
+            background-color: #FFF !important;
+        }
+        .row.date{
+            font-weight: 700;
+        }
+    }
+}

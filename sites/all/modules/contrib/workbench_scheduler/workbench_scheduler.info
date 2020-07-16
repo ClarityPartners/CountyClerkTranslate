@@ -1,0 +1,21 @@
+name = Workbench Scheduler
+description = Provides ability to schedule state changes
+package = Workbench
+core = 7.x
+
+configure = admin/config/workbench/scheduler
+
+dependencies[] = workbench_moderation
+dependencies[] = date
+dependencies[] = date_popup
+files[] = includes/workbench_scheduler_handler_filter_name.inc
+files[] = includes/workbench_scheduler_handler_filter_active.inc
+files[] = actions/workbench_scheduler.action.inc
+files[] = tests/workbench_scheduler.test
+
+; Information added by Drupal.org packaging script on 2017-05-01
+version = "7.x-2.0"
+core = "7.x"
+project = "workbench_scheduler"
+datestamp = "1493650446"
+

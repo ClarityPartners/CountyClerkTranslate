@@ -1,0 +1,15 @@
+name = CKEditor accordion
+description = Adds a CKEditor accordion plugin
+package = user-interface
+core = 7.x
+
+dependencies[] = ckeditor
+
+stylesheets[all][] = css/ckeditor-accordion.css
+scripts[] = js/ckeditor-accordion.js
+; Information added by Drupal.org packaging script on 2017-03-13
+version = "7.x-1.0"
+core = "7.x"
+project = "ckeditor_accordion"
+datestamp = "1489391585"
+

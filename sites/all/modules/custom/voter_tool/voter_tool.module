@@ -1,0 +1,717 @@
+<?php
+/**
+ * Implements hook_menu.
+ */
+function voter_tool_menu() {
+  $items = [];
+
+  $items['service/your-voter-information'] = [
+    'title' => 'Your Voter Information',
+    'description' => 'Search for information about upcoming elections and polling places.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['voter_tool_form'],
+    'access callback' => TRUE,
+  ];
+
+  // This page will update the urls and credentials for various endpoints.
+  $items['admin/config/voter-api-settings/voter-tool'] = [
+    'title' => 'Voter API Settings',
+    'description' => 'Set Voter Search settings here.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['voter_tool_admin_form'],
+    'access arguments' => ['administer_voter_api_settings'],
+    'type' => MENU_LOCAL_TASK,
+  ];
+
+  $items['service/sample-ballot/%/%'] = [
+    'title' => 'Sample Ballot',
+    'description' => 'View sample ballot for election.',
+    'page callback' => 'voter_tool_display_sample_ballot',
+    'page arguments' => [2,3,4],
+    'access callback' => TRUE,
+  ];
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function voter_tool_block_info() {
+  // This example comes from node.module.
+  $blocks['voter_tool'] = [
+    'info' => t('Voter Info block'),
+    'cache' => DRUPAL_NO_CACHE,
+  ];
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * @param string $delta
+ *
+ * @return array
+ */
+function voter_tool_block_view($delta = '') {
+  $block = [];
+
+  switch ($delta) {
+    case 'voter_tool':
+      $block['subject'] = '';
+      $block['content'] = drupal_get_form('voter_tool_form');
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function voter_tool_theme() {
+  return [
+    'voter_info' => [
+      'variables' => ['voter_info' => NULL],
+      'function' => 'voter_tool_theme_voter_info',
+      'file' => 'voter_tool.theme.inc',
+    ],
+    'ballot' => [
+      'variables' => ['ballot' => NULL],
+      'function' => 'voter_tool_theme_ballot',
+      'file' => 'voter_tool.theme.inc',
+    ],
+    'polling' => [
+      'variables' => ['polling' => NULL],
+      'function' => 'voter_tool_theme_polling',
+      'file' => 'voter_tool.theme.inc',
+    ],
+    'mail_ballot' => [
+      'variables' => ['mail_ballot' => NULL],
+      'function' => 'voter_tool_theme_mail_ballot',
+      'file' => 'voter_tool.theme.inc',
+    ],
+    'provisional' => [
+      'variables' => ['provisional' => NULL],
+      'function' => 'voter_tool_theme_provisional',
+      'file' => 'voter_tool.theme.inc',
+    ],
+    'early_voting' => [
+      'variables' => ['early_voting' => NULL],
+      'function' => 'voter_tool_theme_early_voting',
+      'file' => 'voter_tool.theme.inc',
+    ],
+    'print_ballot' => [
+      'variables' => ['ballot' => NULL],
+      'function' => 'voter_tool_theme_print_ballot',
+      'file' => 'voter_tool.theme.inc',
+    ],
+  ];
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ *
+ * @return array
+ */
+function voter_tool_admin_form($form, $form_state) {
+  $form = [];
+  $tab_identities = voter_tool_load_tabs();
+
+  $form['instructions'] = [
+    '#markup' => 'Enter a machine name for each tab and the search type.<br>DO NOT USE DASHES IN MACHINE NAMES<br>Search type is either byaddress or bybirthday.',
+  ];
+
+  $form['container'] = [
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+  ];
+
+  foreach ($tab_identities as $tab) {
+    $name = $tab['name'];
+    $form['container'][$name] = [
+      '#type' => 'fieldset',
+      '#title' => $name,
+      '#tree' => TRUE,
+    ];
+    $form['container'][$name]['vapiid'] = [
+      '#type' => 'hidden',
+      '#value' => $tab['vapiid'],
+    ];
+    $form['container'][$name]['name'] = [
+      '#type' => 'textfield',
+      '#title' => 'machine name for ' . $name,
+      '#default_value' => $name,
+    ];
+    $form['container'][$name]['search_type'] = [
+      '#type' => 'select',
+      '#options' => ['byaddress' => 'byaddress', 'bybirthday' => 'bybirthday'],
+      '#title' => 'search type for ' . $name,
+      '#default_value' => $tab['search_type'],
+    ];
+    $form['container'][$name]['title'] = [
+      '#type' => 'textfield',
+      '#title' => 'Tab label for ' . $name,
+      '#default_value' => $tab['title'],
+    ];
+    $form['container'][$name]['initial_html'] = [
+      '#type' => 'textarea',
+      '#title' => 'Initial top text for ' . $name,
+      '#default_value' => $tab['initial_html'],
+    ];
+    $form['container'][$name]['results_html'] = [
+      '#type' => 'textarea',
+      '#title' => 'Top text when results found for ' . $name,
+      '#default_value' => $tab['results_html'],
+    ];
+    $form['container'][$name]['empty_html'] = [
+      '#type' => 'textarea',
+      '#title' => 'Top text when no results are found for ' . $name,
+      '#default_value' => $tab['empty_html'],
+    ];
+    $form['container'][$name]['error_html'] = [
+      '#type' => 'textarea',
+      '#title' => 'Top text when there is an error during search for ' . $name,
+      '#default_value' => $tab['error_html'],
+    ];
+    $form['container'][$name]['initial_footer'] = [
+      '#type' => 'textarea',
+      '#title' => 'Bottom initial text for ' . $name,
+      '#default_value' => $tab['initial_footer'],
+    ];
+    $form['container'][$name]['results_footer'] = [
+      '#type' => 'textarea',
+      '#title' => 'Bottom text when results are found for ' . $name,
+      '#default_value' => $tab['results_footer'],
+    ];
+    $form['container'][$name]['empty_footer'] = [
+      '#type' => 'textarea',
+      '#title' => 'Bottom text when no results found for ' . $name,
+      '#default_value' => $tab['empty_footer'],
+    ];
+    $form['container'][$name]['error_footer'] = [
+      '#type' => 'textarea',
+      '#title' => 'Bottom text when there is an error during search for ' . $name,
+      '#default_value' => $tab['error_footer'],
+    ];
+    $form['container'][$name]['active_state'] = [
+      '#type' => 'select',
+      '#options' => [0 => 'OFF', 1 => 'ACTIVE'],
+      '#title' => 'Active state for ' . $name,
+      '#default_value' => $tab['active_state'],
+    ];
+  }
+
+  $form['submit'] = [
+    '#type' => 'submit',
+    '#name' => 'voter_settings',
+    '#value' => 'submit',
+  ];
+
+  return $form;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function voter_tool_admin_form_validate($form, &$form_state) {
+
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function voter_tool_admin_form_submit($form, &$form_state) {
+  foreach ($form_state['values']['container'] as $index => $tab) {
+    $tab_id = $tab['vapiid'];
+    db_merge('voter_api_tab')
+      ->key(['vapiid' => $tab_id])
+      ->fields($tab)
+      ->execute();
+  }
+  // We need to clear the cache or the form will reload with stale values.
+  cache_clear_all('voter_tool_tabs_cached', 'cache');
+}
+
+/**
+ * This function loads the data from the voter_tool_tab table into cache.
+ *
+ * @return mixed
+ */
+function voter_tool_load_tabs() {
+  $voter_tool_tabs = &drupal_static(__FUNCTION__);
+  if (!isset($voter_tool_tabs)) {
+    if ($cache = cache_get('voter_tool_tabs_cached')) {
+      $voter_tool_tabs = $cache->data;
+    }
+    else {
+      $query = 'SELECT * FROM voter_api_tab';
+      $results = db_query($query);
+      $voter_tool_tabs = [];
+      while ($result = $results->fetchAssoc()) {
+        $voter_tool_tabs[] = $result;
+      }
+      cache_set('voter_tool_tabs_cached', $voter_tool_tabs, 'cache', time() + 3600);
+    }
+  }
+
+  return $voter_tool_tabs;
+}
+
+/**
+ * @param $tab
+ * @param $output
+ * @param null $resource
+ *
+ * @return array
+ */
+function voter_tool_generate_tab($tab, $output, $resource = NULL) {
+  drupal_add_js(drupal_get_path('module', 'voter_api') . '/js/voter_api.js');
+  drupal_add_js(drupal_get_path('module', 'voter_api') . '/js/jQuery.print.js');
+  $tab_name = $tab['name'];
+
+  $form = [];
+
+  $form[$tab_name] = [
+    '#type' => 'fieldset',
+    '#title' => $tab['title'],
+    '#tree' => TRUE,
+  ];
+  if ($resource && isset($output[$tab_name]['error'])) {
+    // There was an error returned from the api.
+    // Show the form again and the error message.
+    if ($output[$tab_name]['error'] == 'api_error') {
+      // There was an api error. Show that message to the user.
+      $form[$tab_name]['intro'] = [
+        '#markup' => $tab['error_html'],
+      ];
+
+      if (isset($message)) {
+        $form[$tab_name]['error'] = [
+          '#markup' => $output[$tab_name]['message'],
+        ];
+      }
+    }
+    else {
+      // There was no real error, but also no results.
+      $form[$tab_name]['intro'] = [
+        '#markup' => $tab['empty_html'],
+      ];
+    }
+
+    $search_function = 'voter_api_search_' . $tab['search_type'] . '_form';
+    $form[$tab_name] += call_user_func($search_function, $tab_name);
+
+    if ($output[$tab_name]['error'] == 'api_error') {
+      // Show the footer message if there was an api error.
+      $form[$tab_name]['outro'] = [
+        '#markup' => $tab['error_footer'],
+      ];
+    }
+    else {
+      // Show the footer message is there were no results.
+      $form[$tab_name]['outro'] = [
+        '#markup' => $tab['empty_footer'],
+      ];
+    }
+  }
+  elseif ($resource && isset($output[$tab_name])) {
+    // The form submitted and we have results.
+    $form[$tab_name]['intro'] = [
+      '#markup' => $tab['results_html'],
+    ];
+
+    if ($tab_name == 'voter_info') {
+      $form[$tab_name]['results'] = voter_tool_voter_info_output($output);
+    }
+    else {
+      $form[$tab_name]['results'] = [
+        '#markup' => theme($tab_name, [$tab_name => $output[$tab_name]]),
+      ];
+    }
+
+    $form[$tab_name]['outro'] = [
+      '#markup' => $tab['results_footer'],
+    ];
+  }
+  else {
+    // Default state, show search form.
+    $form[$tab_name]['intro'] = [
+      '#markup' => $tab['initial_html'],
+    ];
+
+    $search_function = 'voter_api_search_' . $tab['search_type'] . '_form';
+    $form[$tab_name] += call_user_func($search_function, $tab_name);
+
+    $form[$tab_name]['outro'] = [
+      '#markup' => $tab['initial_footer'],
+    ];
+  }
+
+  return $form;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ *
+ * @return array
+ */
+function voter_tool_form($form, &$form_state) {
+  drupal_add_js(['voterApi' => ['pollingPlaceFound' => 0]], 'setting');
+  $resource = FALSE;
+  $output = [];
+  if (isset($form_state['triggering_element'])) {
+    list($clicked_tab, $resource) = explode('-', $form_state['triggering_element']['#name']);
+    $clean_clicked_tab = str_replace('-', '', $clicked_tab);
+    drupal_add_js(['voterApi' => ['clickedTab' => $clean_clicked_tab]], 'setting');
+    $raw_params = $form_state['values'][$clicked_tab];
+    $params = [];
+    foreach ($raw_params as $key => $value) {
+      if ($value != 'Submit') {
+        $params[$key] = check_plain(trim($value));
+      }
+    }
+    $results = voter_api_fetch_voter_search('/voter/' . $resource, $params);
+    $output = voter_tool_parse_results($results, $resource);
+  }
+
+  $tab_identities = voter_tool_load_tabs();
+  $form = [];
+
+  $form['page_intro'] = [
+    '#markup' => '<div class="elections-link"><a href="/agency/elections">Back To Elections</a></div>',
+  ];
+
+  $form['tabs'] = [
+    '#type' => 'vertical_tabs',
+  ];
+
+  foreach ($tab_identities as $tab) {
+    if ($tab['active_state'] == 1) {
+      $form['tabs'] += voter_tool_generate_tab($tab, $output, $resource);
+    }
+  }
+
+  return $form;
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function voter_tool_form_validate($form, &$form_state) {
+  if (isset($form_state['triggering_element'])) {
+    list($clicked_tab, $resource) = explode('-', $form_state['triggering_element']['#name']);
+    if ($resource == 'byaddress') {
+      // validate byaddress form instance.
+      // TODO: see if this can be generalized.
+      $errors = voter_api_validate_byaddress_form($form_state['values'][$clicked_tab], $clicked_tab);
+      foreach ($errors as $element => $message) {
+        form_set_error($element, $message);
+      }
+    }
+    if ($resource == 'bybirthday') {
+      // validate by birthday form
+      $errors = voter_api_validate_bybirthday_form($form_state['values'][$clicked_tab], $clicked_tab);
+      foreach ($errors as $element => $message) {
+        form_set_error($element, $message);
+      }
+    }
+  }
+}
+
+/**
+ * @param $form
+ * @param $form_state
+ */
+function voter_tool_form_submit($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+}
+
+
+/**
+ * @param $results
+ * @param $resource
+ *
+ * @return array
+ */
+function voter_tool_parse_results($results, $resource) {
+  $return = [];
+  $tab_identities = voter_tool_load_tabs();
+  foreach ($tab_identities as $tab) {
+    if ($results['Status']) {
+      $function = 'voter_tool_extract_' . $tab['name'];
+      if ($tab['search_type'] == 'byaddress' || $tab['search_type'] == $resource) {
+        $return[$tab['name']] = call_user_func($function, $results);
+        if (empty($return[$tab['name']])) {
+          $return[$tab['name']] = [
+            'error' => 'no_results',
+            'message' => 'No Results Found',
+          ];
+        }
+      }
+    }
+    else {
+      if ($tab['search_type'] == $resource) {
+        $return[$tab['name']] = [
+          'error' => 'api_error',
+          'message' => $results['Message'],
+        ];
+      }
+    }
+  }
+
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_voter_info($results) {
+  $return = [];
+
+  foreach ($results['Voters'] as $voter) {
+    $this_voter = [];
+    // Assemble voter full name.
+    $this_voter['name'] = $voter['FirstName'];
+    if (!empty($voter['MiddleName'])) {
+      $this_voter['name'] .= ' ' . $voter['MiddleName'];
+    }
+    $this_voter['name'] .= ' ' . $voter['LastName'];
+    $this_voter['address'] = voter_api_extract_address($voter);
+    $this_voter['precinct_number'] = $voter['PrecinctNumber'];
+    $this_voter['voter_id'] = $voter['VoterId'];
+    $this_voter['split_number'] = $voter['PrecinctSplitId'];
+    $this_voter['township'] = $voter['TownshipName'];
+    $this_voter['status'] = $voter['StatusDescription'];
+    $return[] = $this_voter;
+  }
+
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_polling($results) {
+  $return = [];
+
+  if (isset($results['Voters'][0])) {
+    $polling_place = $results['Voters'][0]['PollingPlace'];
+    if (!empty($polling_place)) {
+      $return['address'] = voter_api_extract_address($polling_place, TRUE);
+      $return['precinct_number'] = $polling_place['PrecinctNumber'];
+      $return['polling_place_number'] = $polling_place['PollingPlaceNumber'];
+      $return['handicapped_accessible'] = $polling_place['HandicapAccessible'];
+      drupal_add_js(['voterApi' => ['pollingPlaceFound' => 1]], 'setting');
+    }
+  }
+
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_early_voting($results) {
+  $return = [];
+
+  if (isset($results['Voters'][0])) {
+    $early_voting = $results['Voters'][0]['EarlyVoting'];
+    foreach ($early_voting as $place) {
+      $return['address'] = voter_api_extract_address($place, TRUE);
+      $return['early_voting_id'] = $place['EarlyVotingLocationId'];
+    }
+    drupal_add_js(['voterApi' => ['earlyPlaceFound' => 1]], 'setting');
+  }
+
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_mail_ballot($results) {
+  $return = [];
+
+  if (isset($results['Voters'][0])) {
+    $return = $results['Voters'][0]['Absentee'];
+    $return['voter_name'] = $results['Voters'][0]['FirstName'] . ' ' . $results['Voters'][0]['LastName'];
+  }
+
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_provisional($results) {
+  $return = [];
+
+  if (isset($results['Voters'][0])) {
+    $return = $results['Voters'][0]['ProvisionalList'];
+    $return['voter_name'] = $results['Voters'][0]['FirstName'] . ' ' . $results['Voters'][0]['LastName'];
+  }
+
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_doeo($results) {
+  $return = [];
+  if (isset($results['Voters'][0])) {
+    $cache_name = 'doeo_precinct_cache_' . $results['Voters'][0]['PrecinctNumber'] . $results['Voters'][0]['PrecinctSplitId'];
+    if ($cache = cache_get($cache_name)) {
+      $officials = $cache->data;
+    }
+    else {
+      $resource = '/ElectedOfficial/GetByPrecinctSplit';
+      $params = [
+        'precinctNumber' => $results['Voters'][0]['PrecinctNumber'],
+        'split' => $results['Voters'][0]['SplitNumber'],
+      ];
+
+      $officials_data = voter_api_fetch_voter_search($resource, $params);
+      $officials = $officials_data['data'];
+      cache_set($cache_name, $officials, 'cache', time() + 60 * 60 * 6);
+    }
+    if ($officials) {
+      $return = doeo_clean_officials($officials);
+    }
+  }
+  return $return;
+}
+
+/**
+ * @param $results
+ *
+ * @return array
+ */
+function voter_tool_extract_ballot($results) {
+  $return = [];
+  $params = [];
+  if (isset($results['Voters'][0])) {
+    $election_resource = '/Election/GetCurrentElectionForAPI';
+
+    $election_data = voter_api_fetch_voter_search($election_resource, $params);
+    $election = $election_data['Election'];
+
+    if (!empty($election)) {
+      $parties = null;
+      if ($election['IsPrimary']) {
+        $parties_resource = '/Candidate/GetPartyList';
+        $parties_data = voter_api_fetch_voter_search($parties_resource, $params);
+        $parties = $parties_data['Parties'];
+      }
+
+      $return['precinctId'] = $results['Voters'][0]['PrecinctNumber'];
+      $return['groupId'] = $results['Voters'][0]['SplitNumber'];
+      $return['primary'] = $election['IsPrimary'];
+      $return['parties'] = $parties;
+    }
+  }
+
+  return $return;
+}
+
+/**
+ * @param $data
+ *
+ * @return array
+ */
+function voter_tool_voter_info_output($data) {
+  $voter_form = [];
+  $voter_form['header'] = [
+    '#prefix' => '<div class="result-labels">',
+    '#markup' => '<span class="namelabel">name</span><span class="townlabel">precinct</span><span class="statuslabel">status</span>',
+    '#suffix' => '</div>',
+  ];
+  foreach ($data['voter_info'] as $voter_id => $voter) {
+    $voter_form[$voter_id] = [
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#title' => '<span class="name">' . $voter['name'] . '</span><span class="town">' . $voter['township'] . ' Precinct ' . substr($voter['precinct_number'], -3) . '</span><span class="status">' . $voter['status'] . '</span>',
+    ];
+    $voter_html = '';
+    $voter_html .= '<div class="' . $voter_id . '">';
+    $voter_html .= 'Voter Name : ' . $voter['name'] . '<br>';
+    $voter_html .= 'Voter Address : <div class="voterAddress">' . $voter['address']['street'] . ', ' . $voter['address']['city'] . ' ' . $voter['address']['zipcode'] . '</div><br>';
+    $voter_html .= 'Precinct Number : ' . $voter['precinct_number'] . '<br>';
+    $voter_html .= '</div>';
+    $voter_form[$voter_id]['markup'] = [
+      '#markup' => $voter_html,
+    ];
+  }
+
+  return $voter_form;
+}
+
+/**
+ *
+ */
+function voter_tool_display_sample_ballot($precinct, $split, $party = null) {
+  drupal_add_js(drupal_get_path('module', 'voter_api') . '/js/voter_api.js');
+  drupal_add_js(drupal_get_path('module', 'voter_api') . '/js/jQuery.print.js');
+  $candidate_stmt = '/Candidate/GetCandidateStatementById';
+  $ballot_resource = '/Candidate/GetBallotInfo';
+  $referendum_resource = '/Candidate/GetBallotReferendaInfo';
+  $data = array();
+  $params = array();
+  $params['precinctId'] = check_plain($precinct);
+  $params['groupId'] = check_plain($split);
+  //$params['electionCode'] = check_plain('110618');
+
+  // Get referendum data.
+  $referendum_data = voter_api_fetch_voter_search($referendum_resource, $params);
+  $referendums = $referendum_data['BallotReferendums'];
+  if (!empty($referendums)) {
+    $data['referendums'] = $referendums;
+  }
+
+  if (!empty($party)) {
+    $params['partyCode'] = check_plain($party);
+  }
+  // Get Ballot data.
+  $ballot_data = voter_api_fetch_voter_search($ballot_resource, $params);
+  $ballot = $ballot_data['CandidateBallots'];
+
+  foreach($ballot as $key => $ballots){
+
+    foreach($ballots['CandidateBallotDetails'] as $candidate_key => $candidate){
+      $stateId = $candidate['CandidateStatementId'];
+      if($stateId != NULL){
+        $params = array(
+          'id' => $stateId,
+        );
+        $statement_data = voter_api_fetch_voter_search($candidate_stmt, $params);
+        $ballot[$key]['CandidateBallotDetails'][$candidate_key]['urls'] = $statement_data['data']['urls'];
+        $ballot[$key]['CandidateBallotDetails'][$candidate_key]['statement'] = $statement_data['data']['statementBody'];
+      }
+    }
+  }
+
+  if (!empty($ballot)) {
+    $data['races'] = $ballot;
+  }
+
+  return theme('print_ballot', ['ballot' => $data]);
+}

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Location Blocks Views feature.
+ */
+
+include_once 'location_blocks_views.features.inc';

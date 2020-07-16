@@ -1,0 +1,603 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Mar 8, 2017, 4:12:13 PM
+    Author     : delion
+*/
+.block-bean{
+    .block-title{
+        display:none;
+    }
+}
+.content.bean-type{
+    padding:50px 0;
+
+    .video{
+        .col{
+            &:first-child{
+                padding-left:0;
+            }
+            iframe{
+                width:100%;
+            }
+        }
+    }
+    .image{
+        .col:first-child img {
+            @media (min-width:$screen-md-min){
+                float: right;
+            }
+        }
+    }
+    &.events{
+        background-color:#f3f3f3;
+
+        .bean-title{
+            text-align:center;
+            border-top:1px solid #d1d1d1;
+            padding-bottom:20px;
+
+            h2{
+                @include font-size(3.0);
+                margin-top:-2%;
+                color: #666;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                font-weight: 700;
+                text-align: center;
+                border: none;
+                background-color: #f3f3f3;
+                padding: 0 15px;
+                display: inline-block;
+                position:relative;
+                vertical-align:top;
+
+                @media (max-width:$screen-md-min){
+                    @include font-size(2.4);
+                }
+                @media (max-width:$screen-xs-max){
+                    @include font-size(2);
+                    padding:0;
+                }
+                @media (min-width:$screen-lg-min){
+                    padding-bottom:20px;
+                }
+            }
+        }
+        .bean-link{
+            text-align:center;
+
+            a{
+                @include make-xs-column(12);
+                @include make-md-column(6);
+                @include make-lg-column(8);
+                color:#FFF;
+                padding:10px 5px;
+                background-color:#65734b;
+                font-weight:600;
+                width: 100%;
+                display: block;
+                //max-width: 60%;
+                margin: 0 auto;
+                text-transform: uppercase;
+                text-decoration: none;
+                float: none !important;
+
+                &:hover{
+                    background-color:#47542e;
+                }
+            }
+
+            @media (max-width:$screen-md-min){
+                margin-bottom:20px;
+            }
+            &.twitter{
+                a{
+                    background-color:#55acee;
+
+                    &:hover{
+                        background-color: #3c90d0;
+                    }
+                }
+            }
+        }
+    }
+
+    &.image{
+        background-color:#f3f3f3;
+
+        @media (min-width:$screen-md-max){
+            //margin-bottom:-5%;
+        }
+    }
+
+    h2{
+        @include montserratBold;
+        @include font-size(3.0);
+        text-transform: uppercase;
+        color:#666666;
+
+        @media (max-width:$screen-md-min){
+            @include font-size(2.4);
+        }
+    }
+    .bean-body{
+        @include lora;
+        @include font-size(1.8);
+        font-style: italic;
+        color: #666;
+    }
+}
+.bean-hero{
+        .search-form.media{
+           .form-control,
+           .btn-fake{
+               height:48px;
+               border-radius:0;
+           }
+           .fake-input{
+               @include make-xs-column(9);
+                @include make-sm-column(10);
+                @include make-md-column(10.8);
+               //max-width:85%;
+               display:inline-block;
+               vertical-align: top;
+           }
+           .btn-fake{
+               @include make-xs-column(3);
+               @include make-sm-column(2);
+               @include make-md-column(1.2);
+
+               background-color:#65734b;
+               border:none;
+               vertical-align: top;
+               display: inline-block;
+               padding:12px 20px;
+               margin-left:-3px;
+               @include font-size(1.8);
+
+               &:hover{
+                   background-color:#47542e;
+                   color:#FFF;
+               }
+               .icon{
+                   display:none;
+               }
+               &:before{
+                   @include fontawesome-icon();
+                   content:"\f002";
+               }
+           }
+        }
+    }
+.bean-video{
+    background-color:#FFF;
+    .video-content{
+        @media (min-width:$screen-lg-min){
+            float:right;
+        }
+    }
+}
+.bean-view{
+    .views-row{
+        background-color: #fff;
+        position: relative;
+        min-height: 195px;
+        margin: 0 0 30px 0;
+        overflow: hidden;
+    }
+    .event-image{
+        @include make-xs-column(4);
+        @include make-md-column(4);
+        @include make-lg-column(4.5);
+        padding:0;
+        max-width:195px;
+        clear:both;
+
+        .event-date{
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            display: block;
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            //background: transparent url(../img/news-flag.png) no-repeat left top;
+            background-color:rgba(255,255,255,0.8);
+            border-radius:50%;
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1em;
+            padding: 15px 0 0 0;
+
+            span{
+                display:block;
+            }
+
+            @media (max-width:$screen-xs-min){
+                @include font-size(1.2);
+                padding: 10px;
+                height: 40px;
+                width: 40px;
+            }
+        }
+        img{
+            height:100%;
+        }
+        .icon{
+            position: absolute;
+            z-index: 9;
+            bottom: 5px;
+            color: #FFF;
+            font-size: 40px;
+            right: 25px;
+        }
+        .Event{
+            @extend .icon;
+            &:before{
+                @include fontawesome-icon();
+                content:"\f073";
+            }
+        }
+        .News{
+            @extend .icon;
+            &:before{
+                @include fontawesome-icon();
+                content:"\f1ea";
+            }
+        }
+        .blank-img{
+            background-color: black;
+            display:block;
+            width:100%;
+
+            &:after{
+                content: "";
+                display: block;
+                padding-bottom: 100%;
+            }
+        }
+    }
+    .event-content{
+        @include make-xs-column(8);
+        @include make-md-column(8);
+        @include make-lg-column(7);
+        padding:15px;
+        color:#999;
+
+        h3{
+            margin: 0 0 0.5em 0;
+            @include lora;
+            font-style: italic;
+            @include font-size(2.0);
+
+             @media (max-width:$screen-xs-min){
+                @include font-size(1.8);
+            }
+        }
+
+        header{
+            display:none; //temporary fix for reference title
+        }
+
+        .media-type{
+            padding:10px 0;
+            color: #999;
+            font-size: 12px;
+            font-style: italic;
+        }
+        .field-collection-container{
+            display:none;
+        }
+
+    }
+    &.twitter{
+        .views-row{
+            padding:10px;
+
+            .tweet{
+                &.head{
+                    .follow{
+                        //margin-left:25px;
+                        padding-left:0;
+                        a{
+                            text-align: center;
+                            border: 1px solid #63b7d0;
+                            border-radius: 4px;
+                            padding: 6px 0;
+                            color:#55acee;
+                            display: block;
+                            text-decoration: none;
+
+                            &:before{
+                                @include fontawesome-icon();
+                                content:"\f099";
+                                padding:0 5px;
+                                @include font-size(1.6);
+                            }
+                            &:hover{
+                                background-color:#55acee;
+                                color:#FFF;
+                            }
+                        }
+                        @media (min-width:$screen-md-min){
+                            margin-left:25px;
+                            padding-left:auto;
+                        }
+                    }
+                    .proimage{
+                        padding-right:0;
+
+                        img{
+                            width:90%;
+                        }
+                    }
+                    .names{
+                        padding-left:0;
+                    }
+                }
+                &.body{
+                    padding:20px 10px;
+                    clear:both;
+                }
+                &.foot{
+                    position:relative;
+                    bottom:10px;
+                    width:100%;
+                    color:#666666;
+
+                    a{
+                        color:#666666;
+                    }
+                    .web-links{
+                        text-align: right;
+                        margin-left:25px;
+                        span{
+                            max-width: 30px;
+                            overflow: hidden;
+                            display:inline-block;
+                            vertical-align: middle;
+
+                            a{
+                                display: inline-block;
+                                vertical-align: middle;
+                                width: 30px;
+                                height: 20px;
+                                overflow: hidden;
+
+                                color:#9e9e9e;
+                                &:hover{
+                                    color:#666;
+                                    text-decoration: none;
+                                }
+                                &:before{
+                                    @include fontawesome-icon();
+                                    padding:10px;
+                                }
+                            }
+                            &:nth-child(1){
+                                a:before{
+                                    content:"\f112";
+                                }
+                                color:#ccc;
+                            }
+                            &:nth-child(2){
+                                a:before{
+                                    content:"\f079";
+                                }
+                                color:#333;
+                            }
+                            &:nth-child(3){
+                                a:before{
+                                    content:"\f004";
+                                }
+                                color:#777;
+                            }
+                        }
+                    }
+                }
+                &.name{
+                    @include latoRegular();
+                    font-weight: 600;
+                    @include font-size(1.8);
+                }
+                &.scname{
+                    @include font-size(1.4);
+                    color:#666;
+                    &:before{
+                        display: inline-block;
+                        content:'@';
+                    }
+                }
+            }
+        }
+    }
+}
+.media-card{
+    @extend .home-card;
+
+    .bean-title{
+        @include font-size(3.5);
+        @include montserratBold;
+        color:#FFF;
+        padding-left:0;
+        padding-right:0;
+    }
+}
+.media-block-container{
+    background-color:#f3f3f3;
+    @extend .bean-view;
+    @include container-fixed();
+    max-width:100%;
+    padding:35px 15px;
+
+    h2.block-title{
+        @include font-size(3.0);
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+        text-align: center;
+        border: none;
+        background-color: #f3f3f3;
+        padding: 0 0 15px;
+        display: block;
+        position:relative;
+        vertical-align:top;
+
+        @media (max-width:$screen-md-min){
+            @include font-size(2.4);
+            padding: 0 0 15px;
+
+            &:after, &:before{
+                max-width:18%;
+            }
+        }
+        @media (min-width:$screen-lg-min){
+            padding-bottom:50px;
+            max-width:$screen-lg;
+            margin:0 auto;
+        }
+        &:after{
+            width: 36%;
+            content:'';
+            border-top: 1px solid #CCC;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left:10px;
+        }
+        &:before{
+            width:36%;
+            content:'';
+            border-top: 1px solid #CCC;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right:10px;
+        }
+    }
+    .view-content{
+        //width:$container-lg;
+        margin:0 auto;
+
+        @media (min-width:$screen-lg-min){
+            width:$container-lg;
+        }
+
+        .views-row{
+            padding-bottom:40px;
+            @include make-xs-column(12);
+            @include make-md-column(5.64);
+            @include make-md-column-offset(.3);
+            @include make-lg-column(5.64);
+            @include make-lg-column-offset(.3); //gutter
+            min-height:195px;
+            //max-height:195px;
+            padding:0;
+
+            &:after {
+              //content:'';
+              box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+              opacity: 0;
+              transition: opacity 0.3s ease-in-out;
+                height: 100%;
+                width: 100%;
+                display: inline-block;
+                position: absolute;
+                top: 0;
+                left:0;
+            }
+
+            /* Transition to showing the bigger shadow on hover */
+            &:hover::after {
+              opacity: 1;
+            }
+
+            &:hover{
+                .vide_overlay{
+                    background-color:#f3f3f3;
+                }
+            }
+            .vid_overlay{
+                position: absolute;
+                top:0;
+                width:100%;
+                height:100%;
+                background-color:#fff;
+
+                .event-image{
+                    &:after{
+                        @include fontawesome-icon();
+                        content:"\f16a";
+                        position: absolute;
+                        top: 27%;
+                        left: 33%;
+                        font-size: 60px;
+                        color: #FFF;
+
+                        @media (max-width:$screen-xs-min){
+                            @include font-size(4.5);
+                        }
+                    }
+                    .blank-img{
+                        background-color: black;
+                        display:block;
+                        width:100%;
+
+                        &:after{
+                            content: "";
+                            display: block;
+                            padding-bottom: 100%;
+                        }
+                    }
+                    .event-date{
+                        display:none;
+                    }
+                }
+            }
+            iframe{
+                width:100%;
+            }
+
+            .file-video{
+                //position:absolute;
+                left:0;
+            }
+            @media (min-width:$screen-sm-min){
+                max-height:195px;
+            }
+        }
+    }
+    .view-footer{
+        text-align:center;
+        clear:both;
+
+        a{
+            @include make-xs-column(12);
+            @include make-md-column(4);
+            @include make-lg-column(3);
+            @include container-fixed;
+            color:#FFF;
+            padding:15px 80px;
+            background-color:#65734b;
+            font-weight:600;
+            width:100%;
+            display:block;
+            margin-top:30px;
+            margin-bottom:30px;
+            text-transform: uppercase;
+            float:none !important;
+
+            &:hover{
+                background-color:#47542e;
+            }
+
+            @media (min-width:$screen-sm-max){
+                max-width: 18%;
+            }
+        }
+    }
+}

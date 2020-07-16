@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the I Want To Queues feature.
+ */
+
+include_once 'i_want_to_queues.features.inc';

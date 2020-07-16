@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Homepage Blocks feature.
+ */
+
+include_once 'homepage_blocks.features.inc';

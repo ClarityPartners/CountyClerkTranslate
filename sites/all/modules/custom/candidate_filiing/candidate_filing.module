@@ -1,0 +1,249 @@
+<?php
+/**
+ * Impliments hook_menu
+ */
+function candidate_filing_menu() {
+  $items = array();
+
+  $items['service/candidate-filing'] = array(
+    'title' => 'Candidate Filings',
+    'description' => 'View the list of Candidate Filings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('candidate_filing_page_form'),
+    'access callback' => TRUE,
+  );
+
+  // This page will update the urls and credentials for various endpoints.
+  $items['admin/config/voter-api-settings/candidate-filing'] = [
+    'title' => 'Candidate Filing Settings',
+    'description' => 'Set Candidate Filing settings here.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['candidate_filing_admin_form'],
+    'access arguments' => ['administer_voter_api_settings'],
+    'type' => MENU_LOCAL_TASK,
+  ];
+
+  return $items;
+}
+
+/**
+ *
+ */
+function candidate_filing_admin_form ($form, &$form_state) {
+  $form = array();
+  $intro_text = variable_get('candidate_filing_intro_text', '');
+  $form['candidate_filing_intro_text'] = array(
+    '#type' => 'text_format',
+    '#title' => 'Intro text to display on candidate filing page.',
+    '#format' => 'full_html',
+    '#default_value' => isset($intro_text['value']) ? $intro_text['value'] : '',
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Form callback for candiadate filing page.
+ */
+function candidate_filing_page_form ($form, &$form_state) {
+//  drupal_add_http_header('Cache-Control', 'max-age=360');
+  $form = array();
+  if (isset($form_state['values']['status_filter'])) {
+    $filter = $form_state['values']['status_filter'];
+  } else {
+    $filter = 'A';
+  }
+  $election = candidate_filing_get_current_election();
+  $intro_text = variable_get('candidate_filing_intro_text', '');
+  $form['intro'] = array(
+    '#markup' => '<h1>Candidate Filing for ' . date('F j, Y', strtotime($election['date'])) . ' ' . $election['name'] . '</h1><div class="introtext">' . $intro_text['value'] . '</div>',
+  );
+  $form['election-link'] = array(
+    '#markup' => '<a href="/agency/elections" class="elections-btn">Back to Elections</a>'
+  );
+
+  $form['open-div'] = array(
+    '#prefix' => '<div class="candidate-bar"><div class="candidate-info container">',
+  );
+  $form['status_filter'] = array(
+    '#type' => 'select',
+    '#options' => array(
+        'A' => 'All',
+        'R' => 'Removed',
+        'W' => 'Withdrawn',
+        'C' => 'Challenged',
+      ),
+    '#title' => 'Filter by Status',
+    '#default_value' => 'A',
+  );
+
+  $form['status_submit'] = array(
+    '#type' => 'submit',
+    '#name' => 'status_submit',
+    '#value' => 'Apply',
+  );
+  $form['close-div'] = array(
+    '#suffix' => '</div></div>',
+  );
+  $filings = candidate_filing_get_filing($election['code'], $filter);
+  //$filings = candidate_filing_get_filing('040417', $filter);
+  $header = array(
+    array('data' => 'Jurisdiction', 'field' => 'Jurisdiction'),
+    array('data' => 'Office', 'field' => 'Office'),
+    array('data' => 'Term', 'field' => 'Term'),
+    array('data' => 'Candidate', 'field' => 'Candidate'),
+    array('data' => 'Party', 'field' => 'Party'),
+    array('data' => 'Address', 'field' => 'Address'),
+    array('data' => 'Filing Date', 'field' => 'Filing Date'),
+    array('data' => 'Status', 'field' => 'Status'),
+  );
+
+  $order = tablesort_get_order($header);
+  $sort = tablesort_get_sort($header);
+  $sql=$order['sql'];
+  if ($sort=='desc') {
+    usort($filings, function($a, $b) use($sql) {
+      return $a['data'][$sql] > $b['data'][$sql]? -1 : 1;
+    });
+  } elseif ($sort=='asc') {
+    usort($filings, function($a, $b) use ($sql) {
+      return $a['data'][$sql] < $b['data'][$sql]? -1 : 1;
+    });
+  }
+
+  $limit = 100;
+  $page = pager_default_initialize(count($filings), $limit, 0);
+  $offset = $limit * $page;
+
+  $form['output'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => array_slice($filings, $offset, $limit),
+    '#empty' => 'There are no Filings yet for the ' . $election['name'] . ' election yet.',
+  );
+
+  $form['pager'] = array(
+    '#theme' => 'pager',
+  );
+
+  return $form;
+}
+
+/**
+ * Form validation for candidate_filing_page_form.
+ */
+function candidate_filing_page_form_validate ($form, &$form_state) {
+
+}
+
+/**
+ * Form submit for candidate_filing_page_form.
+ */
+function candidate_filing_page_form_submit ($form, &$form_state) {
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Fetch the current election data from the api.
+ */
+function candidate_filing_get_current_election () {
+  $resource = '/Election/GetCurrentElectionForAPI';
+  $params = array();
+  $election_data = voter_api_fetch_voter_search($resource, $params);
+  $election = $election_data['Election'];
+  $return = array();
+  $return['code'] = $election['ElectionCode'];
+  $return['name'] = $election['ElectionDescription'];
+  $return['date'] = $election['ElectionDate'];
+  // Maybe these will come back one day.
+  //$return['nursing_home_open']  = $election['NursingHomeOpenDate'];
+  //$return['nursing_home_close'] = $election['NursingHomeCloseDate'];
+  //$return['grace_open']         = $election['GracePeriodOpenDate'];
+  //$return['grace_close']        = $election['GracePeriodCloseDate'];
+  //$return['early_open']         = $election['EarlyOpenDate'];
+  //$return['early_close']        = $election['EarlyCloseDate'];
+  //$return['absentee_open']      = $election['AbsenteeOpenDate'];
+  //$return['absentee_close']     = $election['AbsenteeCloseDate'];
+
+  return $return;
+}
+
+/**
+ *
+ */
+function candidate_filing_get_filing($election_code, $filter) {
+  $params = array();
+  $params['electionCode'] = $election_code;
+  $params['status'] = $filter;
+  $resource = '/Candidate/GetFilingInfo';
+  $results = voter_api_fetch_voter_search($resource, $params);
+  $return = array();
+  foreach ($results['CandidateFilings'] as $key => $filing) {
+    $return[$key]['data']['Jurisdiction'] = $filing['Jurisdiction'];
+//    $return[$key]['JurisdictionType'] = $filing['JurisdictionType'];
+    $return[$key]['data']['Office'] = $filing['Office'];
+    $return[$key]['data']['Term'] = $filing['Term'];
+    $return[$key]['data']['Candidate'] = $filing['FullName'];
+    $return[$key]['data']['Party'] = $filing['Party'];
+    $return[$key]['data']['Address'] = $filing['Address'] . ' ' . $filing['City'];
+    $return[$key]['data']['Filing Date'] = date('Y/m/d H:i a', strtotime($filing['FilingDate']));
+    $return[$key]['data']['Status'] = $filing['Status'];
+  }
+  return $return;
+}
+
+function candidate_filing_block_info(){
+  $blocks = array();
+  $blocks['myblock'] = array(
+    'info' => t('Candidate Filing Block'),
+  );
+
+  return $blocks;
+}
+
+function candidate_filing_block_view($delta='') {
+  $block = array();
+
+  switch($delta) {
+    case 'myblock' :
+      $block['content'] = theme('candidate_filing_output');
+      break;
+  }
+  return $block;
+}
+
+function candidate_filing_block_configure($delta='') {
+  $form = array();
+
+  switch($delta) {
+    case 'myblock' :
+      // Text field form element
+      $form['text_body'] = array(
+        '#type' => 'text_format',
+        '#title' => t('Content copy above candidate form'),
+        '#default_value' => variable_get('text_variable', ''),
+      );
+      break;
+  }
+  return $form;
+}
+
+function candidate_filing_block_save($delta = '', $edit = array()) {
+  switch($delta) {
+    case 'myblock' :
+      // Saving the WYSIWYG text
+      variable_set('text_variable', $edit['text_body']['value']);
+      break;
+  }
+}
+
+//implementation of hook_theme
+function candidate_filing_theme($existing, $type, $theme, $path) {
+  return array(
+    'candidate_filing_output' => array(
+      'template' => 'candidate_filing',
+      'path' => drupal_get_path('module', 'candidate_filing') . '/templates',
+      'variables' => array(),
+    ),
+  );
+}

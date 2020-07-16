@@ -1,0 +1,13 @@
+name = News & Events sidebar
+description = news and events sidebar menu w/ documents and locations
+core = 7.x
+package = County Clerk Views
+version = 7.x-1.7
+dependencies[] = fe_block
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[fe_block_settings][] = views-date_document_block-block_1
+features[fe_block_settings][] = views-date_document_block-news_block
+features[features_api][] = api:2
+features[views_view][] = date_document_block
+features_exclude[dependencies][ctools] = ctools

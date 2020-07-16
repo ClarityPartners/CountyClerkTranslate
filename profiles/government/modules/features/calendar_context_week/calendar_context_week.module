@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Calendar Context Week feature.
+ */
+
+include_once 'calendar_context_week.features.inc';

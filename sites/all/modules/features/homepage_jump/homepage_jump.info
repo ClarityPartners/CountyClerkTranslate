@@ -1,0 +1,10 @@
+name = Homepage Jump
+description = homepage jump menu view
+core = 7.x
+package = County Clerk Views
+version = 7.x-1.2
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = homepage_jump
+features_exclude[dependencies][ctools] = ctools

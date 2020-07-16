@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Media Assets Context feature.
+ */
+
+include_once 'media_assets_context.features.inc';

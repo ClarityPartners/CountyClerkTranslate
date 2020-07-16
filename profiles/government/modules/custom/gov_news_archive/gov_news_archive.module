@@ -1,0 +1,75 @@
+<?php
+
+
+/**
+ * @file
+ * Creates a custom news archive block.
+ */
+
+/**
+ * Implements hook_block_info()
+ *
+ *
+ */
+function gov_news_archive_block_info() {
+  $blocks['news_archive_sidebar_block'] = array(
+    'info' => t('News Archive Sidebar Block'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view()
+ *
+ *
+ */
+
+function gov_news_archive_block_view($delta = '') {
+  // This example is adapted from node.module.
+  $block = array();
+
+  switch ($delta) {
+    case 'news_archive_sidebar_block':
+
+      $sql = 'SELECT DATE_FORMAT(fnd.field_news_date_value, \'%Y\') AS pub_year, 
+    DATE_FORMAT(fnd.field_news_date_value, \'%M %Y\') AS pub_date,
+    DATE_FORMAT(fnd.field_news_date_value, \'%Y-%m\') AS url_date FROM {node} n
+    LEFT JOIN {field_data_field_news_date} fnd ON n.nid = fnd.entity_id
+    WHERE (n.type = \'news\') AND (n.status = 1)
+    GROUP BY pub_date
+    ORDER BY fnd.field_news_date_value DESC';
+
+      $results = db_query($sql);
+      $year = date('Y', strtotime('+1 year'));
+      $content = '';
+      $content .= '<div class="block-name-block-press-rooms"><div class="field-items">';
+
+      foreach ($results as $result) {
+        if ($result->pub_year != $year) {
+          if ($year != date('Y', strtotime('+1 year'))) {
+            $content .= '</div>';
+          }
+          $content .= '<div class="news-archive-year">';
+          $content .= '<div class="field-item"><span class="archive-year-label">' . $result->pub_year . '</span></div>';
+          $content .= '<div class="field-item news-archive-month"><span class="news-archive-month-link"><a href="/news/archive/' . $result->url_date . '" >' . $result->pub_date . '</a></span></div>';
+          $year = $result->pub_year;
+        }
+        else {
+          $content .= '<div class="field-item news-archive-month"><span class="news-archive-month-link"><a href="/news/archive/' . $result->url_date . '" >' . $result->pub_date . '</a></span></div>';
+        }
+      }
+      $content .= '</div>';
+      $content .= '</div></div>';
+
+
+      $block['subject'] = 'Monthly Archive';
+      $block['content'] = array(
+        '#type' => 'markup',
+        '#markup' => $content,
+      );
+      break;
+  }
+
+  return $block;
+}
+

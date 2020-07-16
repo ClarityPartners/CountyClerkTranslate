@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the news sidebar  feature.
+ */
+
+include_once 'news_sidebar_.features.inc';

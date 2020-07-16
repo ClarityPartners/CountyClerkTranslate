@@ -1,0 +1,131 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/*
+    Created on : Feb 20, 2017, 2:58:07 PM
+    Author     : delion
+*/
+
+//font
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Montserrat:400,700|Lora:400,400i');
+
+//Montserrat
+@font-face {
+    font-family: 'Montserrat-regular';
+    src: url('../fonts/Montserrat/Montserrat-Regular.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Montserrat-bold';
+    src: url('../fonts/Montserrat/Montserrat-Bold.ttf') format('truetype');
+}
+//Lato
+@font-face {
+    font-family: 'Lato-regular';
+    src: url('../fonts/Lato/Lato-Regular.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lato-bold';
+    src: url('../fonts/Lato/Lato-Bold.ttf') format('truetype');
+}
+//Lora
+@font-face {
+    font-family: 'Lora-italic';
+    src: url('../fonts/Lora/Lora-Italic.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Lora-bold';
+    src: url('../fonts/Lora/Lora-Bold.ttf') format('truetype');
+}
+
+
+$montserrat: 'Montserrat';
+$lato: 'Lato';
+$lora: 'Lora';
+
+@mixin montserratRegular(){
+    font-family: $montserrat, 'Montserrat-regular';
+    font-weight:400;
+    font-style: normal;
+}
+@mixin montserratBold(){
+    font-family: $montserrat, 'Montserrat-bold';
+    font-weight:700;
+    font-style: normal;
+}
+@mixin latoRegular(){
+    font-family: $lato, 'Lato-regular';
+    font-weight:400;
+    font-style: normal;
+}
+@mixin latoBold(){
+    font-family: $lato, 'Lato-bold';
+    font-weight:700;
+    font-style: normal;
+}
+@mixin lora(){
+    font-family: $lora, 'Lora-italic';
+    font-weight:400;
+    font-style: normal;
+}
+
+@mixin fontawesome-icon {
+  font-family: FontAwesome;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+@mixin services{
+    float:none !important;
+    display:inline-block;
+    vertical-align:top;
+}
+//rem font sizing
+@mixin font-size($sizeValue: 1.6) {
+  font-size: ($sizeValue * 10) + px;
+  font-size: $sizeValue + rem;
+}
+
+h1{
+    @include montserratBold;
+    @include font-size(3.5);
+    //text-transform: uppercase;
+    overflow-wrap: break-word;
+    color:#333;
+
+    &.hero-title{
+        color:#FFF;
+    }
+}
+h2{
+    @include montserratBold;
+    @include font-size(2.4);
+    color:#333;
+}
+h3{
+    @include montserratBold;
+    @include font-size(2.2);
+    color:#333;
+}
+h4{
+    @include montserratBold;
+    @include font-size(1.8);
+    color:#333;
+}
+h5{
+    @include montserratBold;
+    @include font-size(1.5);
+    color:#333;
+}
+h6{
+    @include montserratBold;
+    @include font-size(1.4);
+    color:#333;
+}
+//colors
+$blue-color:#182b52;
+$light-blue-color: #337ab7;
+$grey-color:#f3f3f3;
+$darkBlue-color:#0d152a;
+$btngreen-color:#65734b;
